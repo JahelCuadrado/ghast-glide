@@ -2,20 +2,20 @@
 
 ## 1.0.0 — 2026-10-13
 
-First public release for Minecraft 26.3 (Fabric).
+First release for Minecraft 26.3 (Fabric). The Happy Ghast as it always should have been: a little bit of creative inside survival, to build comfortably anywhere.
 
-- Fly a harnessed Happy Ghast like creative flight: WASD relative to the camera, Space to rise,
-  Sneak to descend, Sprint to speed up; smooth, adjustable acceleration.
-- Speed presets: Vanilla, Calm, Recommended (default, ~6 blocks/s), Fast, Creative and Custom.
-- Optional block pass-through: the ghast ignores blocks while the rider still collides, never
-  ending up inside blocks.
-- No suffocation, no dark texture and no disappearing when the ghast is partly inside blocks.
-- When you leave the ghast: Natural (gentle drift and turns, default), Still or Vanilla.
-- Call your last ridden ghast with a key (default `G`); it flies to you and faces you.
-- A ghast left in water or buried in terrain rises out of it once you step off its head.
-- Dismount with `Left Alt` (rebindable); the mount message shows your key.
-- Settings screen with no extra dependencies (Mod Menu optional), key bindings inside it and an
-  option to hide the ghast in first person.
-- Works on servers without the mod (creative-style flight controls, no pass-through). Servers and
-  LAN hosts can limit speed and pass-through for other players.
-- Translated into 17 languages.
+- Ride a harnessed Happy Ghast like creative flight, with smooth, adjustable acceleration.
+- Pass through blocks to stay with your ghast while building in the air, inside mountains or in
+  tight spaces (can be turned off).
+- Speed presets: faster than vanilla, but much slower than elytra by default; Vanilla, Calm,
+  Recommended, Fast, Creative or your own.
+- Call your ghast back with a key (`G` by default).
+- Choose what your ghast does when you get off: float around naturally, stay still or wander
+  like vanilla.
+- Dismount with `Left Alt`, so Sneak can descend. Every key can be changed.
+- Simple settings screen with no extra libraries (Mod Menu supported) and an option to hide the
+  ghast in first person.
+- Works on servers without the mod (flight controls only); server owners can set limits.
+- Available in English, Español (España), Español (México), Português (Brasil), Português
+  (Portugal), Français, Deutsch, Italiano, Nederlands, Polski, Türkçe, Русский, Українська,
+  简体中文, 繁體中文, 日本語 and 한국어.

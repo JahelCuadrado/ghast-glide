@@ -1,55 +1,35 @@
 # Ghast Glide
 
-Fabric mod for Minecraft 26.3: fly a harnessed Happy Ghast like creative flight.
+The Happy Ghast as it always should have been: a little bit of creative inside survival, to build comfortably anywhere.
+
+Fabric mod for Minecraft 26.3.
 
 ## Features
-
-- WASD moves relative to the camera (pitch ignored), Space ascends, Sneak descends, Sprint speeds up.
-- Optional block pass-through: the ghast ignores blocks while riders still collide.
-- No suffocation damage and no dark texture for a ghast inside blocks.
-- Default top speed ≈ 6 blocks/s (≈ 9 sprinting), so it does not replace elytra; ~2 s to reach it.
-- Your ghast stays where you leave it, and you can call it back with a key. "When left" chooses
-  what it does then: Natural (default) floats gently around that spot (up to 4 blocks sideways, or
-  turning to look around; never upwards nor into blocks, and it only turns while someone stands
-  on it), Still keeps it perfectly still, Vanilla lets it wander like a vanilla Happy Ghast.
-- Built-in settings screen, no extra libraries needed, laid out like YACL config screens (options on
-  the left, description of the hovered option on the right, Save / Undo / Reset): speed preset,
-  horizontal / vertical speed, sprint multiplier, acceleration time, pass-through, when left, hide
-  the ridden ghast in first person (only on your screen) and the mod keys. Open it with its key or
-  from Mod Menu (optional).
-- Translated into English, Spanish (Spain, Mexico), Portuguese (Brazil, Portugal), French, German,
-  Italian, Russian, Ukrainian, Polish, Turkish, Dutch, Chinese (Simplified, Traditional), Japanese
-  and Korean, using each language's official Minecraft terms.
-
-## Speed presets
-
-| Preset | Speed (sprint) | Up | Time to top speed |
-| --- | --- | --- | --- |
-| Vanilla | ≈3.3 blocks/s (no sprint) | ≈1.6 blocks/s | ≈1.2 s |
-| Calm | 4 (6) blocks/s | 4.5 blocks/s | 2.5 s |
-| Recommended (default) | 6 (9) blocks/s | 4.5 blocks/s | 2 s |
-| Fast | 8 (12) blocks/s | 4.5 blocks/s | 1.5 s |
-| Creative | ≈10.1 (≈20.2) blocks/s | 4.5 blocks/s | ≈1.2 s |
-| Custom | your slider values | | |
-
-Vanilla matches a vanilla ridden Happy Ghast flying level; Creative matches creative flight.
-Moving any slider switches to Custom. Server speed caps still apply.
-
-## Keys (rebindable in the mod settings or Options → Controls)
-
-| Action | Default |
-| --- | --- |
-| Dismount | `Left Alt` |
-| Call your last ridden ghast | `G` |
-| Toggle pass-through | unbound |
-| Open settings | unbound |
+- **Fly like in creative:** WASD moves where you look, Space goes up, Sneak goes down, Sprint for
+  extra speed. Smooth, natural acceleration.
+- **Pass through blocks:** your ghast glides through terrain, so you can stay with it comfortably
+  while building in the air, inside mountains or in tight spaces. Turn it off whenever you want.
+- **Balanced speed:** faster than a vanilla Happy Ghast, but much slower than elytra, so it is a
+  building tool, not a replacement. Pick a preset (Vanilla, Calm, Recommended, Fast, Creative) or
+  tune your own.
+- **Call your ghast:** press a key (`G` by default) and it flies back to you.
+- **Leave it how you like:** when you get off, it floats around naturally, stays completely still
+  or wanders like vanilla. Your choice.
+- **Easy dismount:** `Left Alt` gets you off, since Sneak is used to descend. Every key can be
+  changed.
+- **Simple settings screen** with no extra libraries (Mod Menu supported), including an option to
+  hide the ghast in first person for a clear view while you build.
+- **Lightweight:** no noticeable impact on performance.
+- **Languages:** English, Español (España), Español (México), Português (Brasil), Português (Portugal),
+  Français, Deutsch, Italiano, Nederlands, Polski, Türkçe, Русский, Українська, 简体中文, 繁體中文,
+  日本語 and 한국어.
 
 ## Servers
 
-Install on the client **and** the server (singleplayer works out of the box). On servers without
-the mod you still get creative-style flight controls (look + forward to climb or dive) without
-pass-through. Servers (dedicated or LAN) can restrict it in `config/ghastglide-server.json`; the
-singleplayer/LAN host is never limited:
+Install it on both client and server for the full experience (singleplayer works out of the box).
+On servers without the mod you still get the creative-style flight controls, without passing
+through blocks. Server owners can limit speed and block pass-through for other players in
+`config/ghastglide-server.json` (the singleplayer/LAN host is never limited):
 
 ```json
 { "schemaVersion": 1, "allowNoclip": true, "maxSpeedMultiplier": 15.0 }
