@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "id": "ghastglide",
+  "version": "${version}",
+  "name": "Ghast Glide",
+  "description": "Fly a Happy Ghast exactly like creative flight, with configurable speed and optional block pass-through.",
+  "authors": [
+    "Jahel Cuadrado"
+  ],
+  "contact": {
+    "homepage": "https://github.com/JahelCuadrado/ghast-glide",
+    "sources": "https://github.com/JahelCuadrado/ghast-glide",
+    "issues": "https://github.com/JahelCuadrado/ghast-glide/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/ghastglide/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.einsteinmods.ghastglide.GhastGlide"
+    ],
+    "client": [
+      "com.einsteinmods.ghastglide.client.GhastGlideClient"
+    ],
+    "modmenu": [
+      "com.einsteinmods.ghastglide.client.config.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "ghastglide.mixins.json",
+    {
+      "config": "ghastglide.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "fabric-api": "*"
+  },
+  "recommends": {
+    "modmenu": "*"
+  }
+}

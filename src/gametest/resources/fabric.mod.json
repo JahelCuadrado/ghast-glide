@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "ghastglide-gametest",
+  "version": "1.0.0",
+  "name": "Ghast Glide GameTests",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-gametest": [
+      "com.einsteinmods.ghastglide.gametest.AnchorGameTest",
+      "com.einsteinmods.ghastglide.gametest.GhastLightGameTest",
+      "com.einsteinmods.ghastglide.gametest.NoclipGameTest",
+      "com.einsteinmods.ghastglide.gametest.RiderClearanceGameTest"
+    ]
+  },
+  "depends": {
+    "ghastglide": "*"
+  }
+}
