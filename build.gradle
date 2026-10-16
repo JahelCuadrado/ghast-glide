@@ -34,8 +34,18 @@ fabricApi {
 		createSourceSet = true
 		modId = "ghastglide-gametest"
 		enableGameTests = true
-		enableClientGameTests = false
+		enableClientGameTests = true
 		eula = true
+	}
+}
+
+// Client GameTests open a real game window: start it muted. The run directory is cleared before
+// each run (deleteGameTestRunDir), so the option is written right before launch.
+tasks.named("runClientGameTest") {
+	def optionsFile = file("build/run/clientGameTest/options.txt")
+	doFirst {
+		optionsFile.parentFile.mkdirs()
+		optionsFile.text = "soundCategory_master:0.0\n"
 	}
 }
 

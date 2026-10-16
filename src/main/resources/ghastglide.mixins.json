@@ -3,15 +3,19 @@
   "package": "com.einsteinmods.ghastglide.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
+    "BlockItemMixin",
+    "BoatItemAccessor",
     "BodyRotationControlMixin",
     "EntityMixin",
     "HappyGhastAnchorMixin",
+    "HappyGhastBoatMixin",
     "HappyGhastLightMixin",
     "HappyGhastLookControlMixin",
     "HappyGhastMixin",
     "LivingEntityMixin",
     "PlayerMixin",
-    "ServerGamePacketListenerImplMixin"
+    "ServerGamePacketListenerImplMixin",
+    "StandingAndWallBlockItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

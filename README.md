@@ -12,13 +12,17 @@ Fabric mod for Minecraft 26.3.
 - **Balanced speed:** faster than a vanilla Happy Ghast, but much slower than elytra, so it is a
   building tool, not a replacement. Pick a preset (Vanilla, Calm, Recommended, Fast, Creative) or
   tune your own.
-- **Call your ghast:** press a key (`G` by default) and it flies back to you.
+- **Call your ghast:** press a key (`G` by default) and it flies back, stopping a few blocks away.
+- **Hang a boat from it:** right-click your ghast with a boat and a lead in your inventory to carry
+  friends or mobs underneath.
+- **Build through your ghast** (optional): place blocks where its body is while you ride.
+- **Vanilla controls option:** fly the base-game way if you prefer, keeping every other feature.
 - **Leave it how you like:** when you get off, it floats around naturally, stays completely still
   or wanders like vanilla. Your choice.
 - **Easy dismount:** `Left Alt` gets you off, since Sneak is used to descend. Every key can be
   changed.
 - **Simple settings screen** with no extra libraries (Mod Menu supported), including an option to
-  hide the ghast in first person for a clear view while you build.
+  hide the ghast (and the boats hanging from it) in first person for a clear view while you build.
 - **Lightweight:** no noticeable impact on performance.
 - **Languages:** English, Español (España), Español (México), Português (Brasil), Português (Portugal),
   Français, Deutsch, Italiano, Nederlands, Polski, Türkçe, Русский, Українська, 简体中文, 繁體中文,

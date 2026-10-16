@@ -3,6 +3,7 @@ package com.einsteinmods.ghastglide.core;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -178,14 +179,19 @@ class FlightPresetTest {
             GlideSettings.DEFAULTS.sprintMultiplier(),
             GlideSettings.DEFAULTS.accelerationSeconds() + 0.1,
             true,
-            LeaveMode.NATURAL);
+            LeaveMode.NATURAL,
+            ControlScheme.MOD,
+            true,
+            false);
 
     assertSame(FlightPreset.CUSTOM, FlightPreset.matching(tweaked));
   }
 
   @Test
   void customKeepsTheCurrentValues() {
-    GlideSettings current = new GlideSettings(2.0, 3.0, 1.2, 0.5, false, LeaveMode.NATURAL);
+    GlideSettings current =
+        new GlideSettings(
+            2.0, 3.0, 1.2, 0.5, false, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
 
     assertEquals(current, FlightPreset.CUSTOM.applyTo(current));
   }
@@ -198,6 +204,20 @@ class FlightPresetTest {
   }
 
   @Test
+  void applyingAPresetKeepsBoatHanging() {
+    GlideSettings withoutHanging = GlideSettings.DEFAULTS.withHangBoatWithClick(false);
+
+    assertFalse(FlightPreset.FAST.applyTo(withoutHanging).hangBoatWithClick());
+  }
+
+  @Test
+  void applyingAPresetKeepsBuildThroughGhast() {
+    GlideSettings building = GlideSettings.DEFAULTS.withBuildThroughGhast(true);
+
+    assertTrue(FlightPreset.FAST.applyTo(building).buildThroughGhast());
+  }
+
+  @Test
   void applyingAPresetKeepsLeaveMode() {
     GlideSettings still = GlideSettings.DEFAULTS.withLeaveMode(LeaveMode.STILL);
 
@@ -205,5 +225,16 @@ class FlightPresetTest {
 
     assertSame(LeaveMode.STILL, applied.leaveMode());
     assertSame(FlightPreset.CALM, FlightPreset.matching(applied));
+  }
+
+  @Test
+  void applyingAPresetKeepsControlSchemeAndSchemeDoesNotChangeTheMatch() {
+    GlideSettings vanillaControls = GlideSettings.DEFAULTS.withControlScheme(ControlScheme.VANILLA);
+
+    GlideSettings applied = FlightPreset.FAST.applyTo(vanillaControls);
+
+    assertSame(ControlScheme.VANILLA, applied.controlScheme());
+    assertSame(FlightPreset.FAST, FlightPreset.matching(applied));
+    assertSame(FlightPreset.RECOMMENDED, FlightPreset.matching(vanillaControls));
   }
 }

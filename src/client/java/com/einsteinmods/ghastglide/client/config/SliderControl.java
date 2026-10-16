@@ -118,7 +118,7 @@ final class SliderControl extends OptionControl<Double> {
   }
 
   private boolean showsTrack() {
-    return isHoveredOrFocused() || dragging;
+    return active && (isHoveredOrFocused() || dragging);
   }
 
   private int trackWidth() {

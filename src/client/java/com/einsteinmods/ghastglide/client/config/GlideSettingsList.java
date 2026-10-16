@@ -130,7 +130,7 @@ final class GlideSettingsList extends ContainerObjectSelectionList<GlideSettings
       int y = getContentY();
       control.setRectangle(getContentWidth() - RESET_BUTTON_SIZE, OptionControl.HEIGHT, x, y);
       control.extractRenderState(graphics, mouseX, mouseY, partialTick);
-      reset.active = !control.isDefault();
+      reset.active = control.active && !control.isDefault();
       reset.setPosition(control.getRight(), y);
       reset.extractRenderState(graphics, mouseX, mouseY, partialTick);
       if (hovered || control.isFocused()) {

@@ -28,6 +28,9 @@ abstract class OptionControl<T> extends AbstractWidget implements DescribedOptio
   static final int HEIGHT = 20;
   static final int TEXT_COLOR = 0xFFFFFFFF;
 
+  /** Text of an inactive row, as vanilla {@code AbstractWidget.WithInactiveMessage}. */
+  static final int INACTIVE_TEXT_COLOR = 0xFFA0A0A0;
+
   /** Shadow under drawn controls (tick box, slider), as YACL. */
   static final int CONTROL_SHADOW_COLOR = 0xFF404040;
 
@@ -119,7 +122,12 @@ abstract class OptionControl<T> extends AbstractWidget implements DescribedOptio
   /** Draws the value or control on the right side of the box. */
   protected void extractControl(GuiGraphicsExtractor graphics, int textY) {
     Component text = valueText();
-    graphics.text(font, text, getRight() - X_PADDING - font.width(text), textY, TEXT_COLOR, true);
+    graphics.text(font, text, getRight() - X_PADDING - font.width(text), textY, textColor(), true);
+  }
+
+  /** Grey while the row is inactive. */
+  protected final int textColor() {
+    return active ? TEXT_COLOR : INACTIVE_TEXT_COLOR;
   }
 
   protected final int centerY() {
@@ -138,7 +146,7 @@ abstract class OptionControl<T> extends AbstractWidget implements DescribedOptio
         getHeight());
     int textY = centerY() - font.lineHeight / 2;
     int nameWidth = getWidth() - controlWidth() - X_PADDING - NAME_VALUE_GAP;
-    graphics.text(font, fittedName(nameWidth), getX() + X_PADDING, textY, TEXT_COLOR, true);
+    graphics.text(font, fittedName(nameWidth), getX() + X_PADDING, textY, textColor(), true);
     extractControl(graphics, textY);
     handleCursor(graphics);
   }

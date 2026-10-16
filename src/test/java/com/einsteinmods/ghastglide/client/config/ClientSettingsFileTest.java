@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.einsteinmods.ghastglide.config.JsonConfigFile;
+import com.einsteinmods.ghastglide.core.ControlScheme;
 import com.einsteinmods.ghastglide.core.FlightPreset;
 import com.einsteinmods.ghastglide.core.GlideSettings;
 import com.einsteinmods.ghastglide.core.LeaveMode;
@@ -128,6 +129,17 @@ class ClientSettingsFileTest {
       }
       """;
 
+  private static final String SCHEMA_6_UNKNOWN_SCHEME_JSON =
+      """
+      {
+        "schemaVersion": 6,
+        "preset": "RECOMMENDED",
+        "noclipEnabled": true,
+        "leaveMode": "STILL",
+        "controlScheme": "JOYSTICK"
+      }
+      """;
+
   private static ClientSettingsFile load(Path directory, String json) throws IOException {
     Path path = directory.resolve(ClientSettingsFile.FILE_NAME);
     Files.writeString(path, json, StandardCharsets.UTF_8);
@@ -154,7 +166,9 @@ class ClientSettingsFileTest {
 
   @Test
   void schemaTwoOtherValuesMigrateToCustom(@TempDir Path directory) throws IOException {
-    GlideSettings custom = new GlideSettings(2.0, 1.5, 3.0, 1.0, true, LeaveMode.NATURAL);
+    GlideSettings custom =
+        new GlideSettings(
+            2.0, 1.5, 3.0, 1.0, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
 
     GlideSettings settings = load(directory, schemaTwo(custom)).toSettings();
 
@@ -177,7 +191,10 @@ class ClientSettingsFileTest {
   void unknownPresetKeepsStoredSpeeds(@TempDir Path directory) throws IOException {
     GlideSettings settings = load(directory, SCHEMA_3_UNKNOWN_PRESET_JSON).toSettings();
 
-    assertEquals(new GlideSettings(2.0, 1.5, 3.0, 1.0, true, LeaveMode.NATURAL), settings);
+    assertEquals(
+        new GlideSettings(
+            2.0, 1.5, 3.0, 1.0, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false),
+        settings);
   }
 
   @Test
@@ -190,7 +207,10 @@ class ClientSettingsFileTest {
             .load()
             .toSettings();
 
-    assertEquals(new GlideSettings(2.0, 1.5, 3.0, 2.0, false, LeaveMode.NATURAL), settings);
+    assertEquals(
+        new GlideSettings(
+            2.0, 1.5, 3.0, 2.0, false, LeaveMode.NATURAL, ControlScheme.MOD, true, false),
+        settings);
     assertEquals(GlideSettings.DEFAULT_ACCELERATION_SECONDS, settings.accelerationSeconds());
   }
 
@@ -199,7 +219,9 @@ class ClientSettingsFileTest {
     Path path = directory.resolve(ClientSettingsFile.FILE_NAME);
     JsonConfigFile<ClientSettingsFile> file =
         new JsonConfigFile<>(path, ClientSettingsFile.class, ClientSettingsFile.DEFAULTS);
-    GlideSettings saved = new GlideSettings(1.0, 1.0, 1.5, 0.7, true, LeaveMode.NATURAL);
+    GlideSettings saved =
+        new GlideSettings(
+            1.0, 1.0, 1.5, 0.7, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
 
     file.save(ClientSettingsFile.from(saved, ClientPreferences.DEFAULTS));
 
@@ -214,7 +236,9 @@ class ClientSettingsFileTest {
 
     for (FlightPreset preset : FlightPreset.values()) {
       GlideSettings saved =
-          preset.applyTo(new GlideSettings(2.0, 1.5, 3.0, 1.0, false, LeaveMode.NATURAL));
+          preset.applyTo(
+              new GlideSettings(
+                  2.0, 1.5, 3.0, 1.0, false, LeaveMode.NATURAL, ControlScheme.MOD, true, false));
       file.save(ClientSettingsFile.from(saved, ClientPreferences.DEFAULTS));
 
       ClientSettingsFile loaded = file.load();
@@ -257,6 +281,40 @@ class ClientSettingsFileTest {
   }
 
   @Test
+  void missingBoatHangingLoadsEnabled(@TempDir Path directory) throws IOException {
+    assertTrue(load(directory, SCHEMA_6_UNKNOWN_MODE_JSON).toSettings().hangBoatWithClick());
+  }
+
+  @Test
+  void roundTripKeepsBoatHangingDisabled(@TempDir Path directory) {
+    Path path = directory.resolve(ClientSettingsFile.FILE_NAME);
+    JsonConfigFile<ClientSettingsFile> file =
+        new JsonConfigFile<>(path, ClientSettingsFile.class, ClientSettingsFile.DEFAULTS);
+    GlideSettings saved = GlideSettings.DEFAULTS.withHangBoatWithClick(false);
+
+    file.save(ClientSettingsFile.from(saved, ClientPreferences.DEFAULTS));
+
+    assertEquals(saved, file.load().toSettings());
+  }
+
+  @Test
+  void missingBuildThroughGhastLoadsDisabled(@TempDir Path directory) throws IOException {
+    assertFalse(load(directory, SCHEMA_6_UNKNOWN_MODE_JSON).toSettings().buildThroughGhast());
+  }
+
+  @Test
+  void roundTripKeepsBuildThroughGhastEnabled(@TempDir Path directory) {
+    Path path = directory.resolve(ClientSettingsFile.FILE_NAME);
+    JsonConfigFile<ClientSettingsFile> file =
+        new JsonConfigFile<>(path, ClientSettingsFile.class, ClientSettingsFile.DEFAULTS);
+    GlideSettings saved = GlideSettings.DEFAULTS.withBuildThroughGhast(true);
+
+    file.save(ClientSettingsFile.from(saved, ClientPreferences.DEFAULTS));
+
+    assertEquals(saved, file.load().toSettings());
+  }
+
+  @Test
   void roundTripKeepsEveryLeaveMode(@TempDir Path directory) throws IOException {
     Path path = directory.resolve(ClientSettingsFile.FILE_NAME);
     JsonConfigFile<ClientSettingsFile> file =
@@ -272,6 +330,39 @@ class ClientSettingsFileTest {
       assertFalse(
           Files.readString(path, StandardCharsets.UTF_8).contains("idleDriftEnabled"),
           "the former boolean must not be written");
+    }
+  }
+
+  @Test
+  void filesWithoutControlSchemeLoadModControls(@TempDir Path directory) throws IOException {
+    assertSame(ControlScheme.MOD, load(directory, SCHEMA_4_JSON).toSettings().controlScheme());
+    assertSame(
+        ControlScheme.MOD,
+        load(directory, SCHEMA_6_UNKNOWN_MODE_JSON).toSettings().controlScheme());
+  }
+
+  @Test
+  void unknownControlSchemeBecomesModControls(@TempDir Path directory) throws IOException {
+    GlideSettings settings = load(directory, SCHEMA_6_UNKNOWN_SCHEME_JSON).toSettings();
+
+    assertSame(ControlScheme.MOD, settings.controlScheme());
+    assertSame(LeaveMode.STILL, settings.leaveMode());
+  }
+
+  @Test
+  void roundTripKeepsEveryControlScheme(@TempDir Path directory) {
+    Path path = directory.resolve(ClientSettingsFile.FILE_NAME);
+    JsonConfigFile<ClientSettingsFile> file =
+        new JsonConfigFile<>(path, ClientSettingsFile.class, ClientSettingsFile.DEFAULTS);
+
+    for (ControlScheme scheme : ControlScheme.values()) {
+      GlideSettings saved =
+          FlightPreset.FAST.applyTo(GlideSettings.DEFAULTS.withControlScheme(scheme));
+      file.save(ClientSettingsFile.from(saved, ClientPreferences.DEFAULTS));
+
+      ClientSettingsFile loaded = file.load();
+      assertEquals(saved, loaded.toSettings());
+      assertSame(FlightPreset.FAST, loaded.preset());
     }
   }
 

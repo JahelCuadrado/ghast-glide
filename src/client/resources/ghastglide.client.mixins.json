@@ -4,8 +4,10 @@
   "compatibilityLevel": "JAVA_25",
   "client": [
     "ClientPacketListenerMixin",
+    "EntityRendererMixin",
     "LevelExtractorMixin",
-    "LevelExtractorSectionMixin"
+    "LevelExtractorSectionMixin",
+    "MinecraftMixin"
   ],
   "injectors": {
     "defaultRequire": 1

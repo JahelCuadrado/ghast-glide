@@ -2,6 +2,7 @@ package com.einsteinmods.ghastglide.client.config;
 
 import com.einsteinmods.ghastglide.client.ClientGlideState;
 import com.einsteinmods.ghastglide.client.GlideKeyMappings;
+import com.einsteinmods.ghastglide.core.ControlScheme;
 import com.einsteinmods.ghastglide.core.FlightPreset;
 import com.einsteinmods.ghastglide.core.GlideSettings;
 import com.einsteinmods.ghastglide.core.LeaveMode;
@@ -57,6 +58,7 @@ public final class GlideSettingsScreen extends Screen {
   private static final String TOOLTIP_SUFFIX = ".tooltip";
   private static final String PRESET_KEY_PREFIX = KEY_PREFIX + "preset.";
   private static final String LEAVE_MODE_KEY = KEY_PREFIX + "leave_mode";
+  private static final String CONTROL_SCHEME_KEY = KEY_PREFIX + "controls";
   private static final String MULTIPLIER_FORMAT = "x%.1f";
   private static final String SECONDS_FORMAT = "%.1f s";
 
@@ -96,6 +98,7 @@ public final class GlideSettingsScreen extends Screen {
 
   private final @Nullable Screen parent;
   private final ClientGlideState state;
+  private final CyclingControl<ControlScheme> controlScheme;
   private final SliderControl horizontal;
   private final SliderControl vertical;
   private final SliderControl sprint;
@@ -103,6 +106,8 @@ public final class GlideSettingsScreen extends Screen {
   private final CyclingControl<FlightPreset> preset;
   private final TickBoxControl noclip;
   private final CyclingControl<LeaveMode> leaveMode;
+  private final TickBoxControl hangBoat;
+  private final TickBoxControl buildThroughGhast;
   private final TickBoxControl hideGhastInFirstPerson;
 
   /** Key rows in display order, each with the mapping it edits. */
@@ -132,6 +137,17 @@ public final class GlideSettingsScreen extends Screen {
     GlideSettings settings = state.requested();
     GlideSettings defaults = GlideSettings.DEFAULTS;
     Consumer<Double> onSpeedChange = value -> selectMatchingPreset();
+    controlScheme =
+        register(
+            new CyclingControl<>(
+                font,
+                Component.translatable(CONTROL_SCHEME_KEY),
+                Arrays.asList(ControlScheme.values()),
+                value -> Component.translatable(controlSchemeKey(value)),
+                value -> Component.translatable(controlSchemeKey(value) + DESCRIPTION_SUFFIX),
+                settings.controlScheme(),
+                defaults.controlScheme(),
+                value -> updateButtons()));
     Map<FlightPreset, Component> presetNames = new EnumMap<>(FlightPreset.class);
     Map<FlightPreset, Component> presetDescriptions = new EnumMap<>(FlightPreset.class);
     for (FlightPreset value : FlightPreset.values()) {
@@ -197,6 +213,9 @@ public final class GlideSettingsScreen extends Screen {
                 settings.leaveMode(),
                 defaults.leaveMode(),
                 value -> updateButtons()));
+    hangBoat = toggle("hang_boat", settings.hangBoatWithClick(), defaults.hangBoatWithClick());
+    buildThroughGhast =
+        toggle("build_through_ghast", settings.buildThroughGhast(), defaults.buildThroughGhast());
     hideGhastInFirstPerson =
         toggle(
             "hide_ghast_first_person",
@@ -223,6 +242,7 @@ public final class GlideSettingsScreen extends Screen {
     list = new GlideSettingsList(minecraft, description::show);
     for (OptionControl<?> option :
         List.<OptionControl<?>>of(
+            controlScheme,
             preset,
             horizontal,
             vertical,
@@ -230,6 +250,8 @@ public final class GlideSettingsScreen extends Screen {
             acceleration,
             noclip,
             leaveMode,
+            hangBoat,
+            buildThroughGhast,
             hideGhastInFirstPerson)) {
       list.addOption(option);
     }
@@ -431,15 +453,26 @@ public final class GlideSettingsScreen extends Screen {
         sprint.get(),
         acceleration.get(),
         noclip.get(),
-        leaveMode.get());
+        leaveMode.get(),
+        controlScheme.get(),
+        hangBoat.get(),
+        buildThroughGhast.get());
   }
 
   private boolean hasPendingChanges() {
     return controls.stream().anyMatch(OptionControl::isChanged);
   }
 
-  /** Button labels follow YACL: Save Changes / Done, Cancel / Reset; Undo only with changes. */
+  /**
+   * Button labels follow YACL: Save Changes / Done, Cancel / Reset; Undo only with changes. Every
+   * value change ends here, so it also greys out the speed rows, which vanilla controls ignore
+   * (they keep their values).
+   */
   private void updateButtons() {
+    boolean speedsApply = controlScheme.get() == ControlScheme.MOD;
+    for (OptionControl<?> speedRow : List.of(preset, horizontal, vertical, sprint, acceleration)) {
+      speedRow.active = speedsApply;
+    }
     boolean pending = hasPendingChanges();
     saveOrDone.setMessage(pending ? SAVE : CommonComponents.GUI_DONE);
     saveOrDone.setTooltip(pending ? SAVE_TOOLTIP : DONE_TOOLTIP);
@@ -492,6 +525,10 @@ public final class GlideSettingsScreen extends Screen {
 
   private static String leaveModeKey(LeaveMode value) {
     return LEAVE_MODE_KEY + "." + value.name().toLowerCase(Locale.ROOT);
+  }
+
+  private static String controlSchemeKey(ControlScheme value) {
+    return CONTROL_SCHEME_KEY + "." + value.name().toLowerCase(Locale.ROOT);
   }
 
   private static String presetKey(FlightPreset value) {

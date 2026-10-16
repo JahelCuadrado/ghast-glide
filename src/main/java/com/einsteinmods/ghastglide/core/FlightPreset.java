@@ -91,11 +91,14 @@ public enum FlightPreset {
         sprintMultiplier,
         accelerationSeconds,
         current.noclipEnabled(),
-        current.leaveMode());
+        current.leaveMode(),
+        current.controlScheme(),
+        current.hangBoatWithClick(),
+        current.buildThroughGhast());
   }
 
   /**
-   * The preset whose speeds equal the given settings (noclip and leave mode ignored), else {@link
+   * The preset whose speeds equal the given settings (non-speed fields ignored), else {@link
    * #CUSTOM}.
    */
   public static FlightPreset matching(GlideSettings settings) {

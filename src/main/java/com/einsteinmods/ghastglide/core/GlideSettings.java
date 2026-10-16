@@ -9,6 +9,10 @@ package com.einsteinmods.ghastglide.core;
  * @param accelerationSeconds seconds needed to reach 90% of top speed (and to lose 90% of it)
  * @param noclipEnabled whether the ghast ignores block collisions
  * @param leaveMode what a ghast this player dismounts (or calls) does once left
+ * @param controlScheme how the player flies: the mod's controls or vanilla's (speeds unused then)
+ * @param hangBoatWithClick whether using a boat on the ridden ghast hangs it below with a lead
+ * @param buildThroughGhast whether the ridden ghast (and its other passengers) never obstruct the
+ *     blocks this player places while riding it
  */
 public record GlideSettings(
     double horizontalMultiplier,
@@ -16,7 +20,10 @@ public record GlideSettings(
     double sprintMultiplier,
     double accelerationSeconds,
     boolean noclipEnabled,
-    LeaveMode leaveMode) {
+    LeaveMode leaveMode,
+    ControlScheme controlScheme,
+    boolean hangBoatWithClick,
+    boolean buildThroughGhast) {
 
   public static final double MIN_SPEED_MULTIPLIER = 0.1;
   public static final double MAX_SPEED_MULTIPLIER = 10.0;
@@ -45,12 +52,15 @@ public record GlideSettings(
           DEFAULT_SPRINT_MULTIPLIER,
           DEFAULT_ACCELERATION_SECONDS,
           true,
-          LeaveMode.DEFAULT);
+          LeaveMode.DEFAULT,
+          ControlScheme.DEFAULT,
+          true,
+          false);
 
   /**
    * Returns a copy with every value forced into its allowed range (NaN falls back to default). A
    * non-positive acceleration also falls back to default: files written before the field existed
-   * deserialize it as 0. A missing leave mode becomes the default.
+   * deserialize it as 0. A missing leave mode or control scheme becomes the default.
    */
   public GlideSettings sanitized() {
     return new GlideSettings(
@@ -77,7 +87,10 @@ public record GlideSettings(
                 DEFAULTS.accelerationSeconds)
             : DEFAULTS.accelerationSeconds,
         noclipEnabled,
-        leaveMode == null ? LeaveMode.DEFAULT : leaveMode);
+        leaveMode == null ? LeaveMode.DEFAULT : leaveMode,
+        controlScheme == null ? ControlScheme.DEFAULT : controlScheme,
+        hangBoatWithClick,
+        buildThroughGhast);
   }
 
   public GlideSettings withNoclipEnabled(boolean enabled) {
@@ -87,7 +100,10 @@ public record GlideSettings(
         sprintMultiplier,
         accelerationSeconds,
         enabled,
-        leaveMode);
+        leaveMode,
+        controlScheme,
+        hangBoatWithClick,
+        buildThroughGhast);
   }
 
   public GlideSettings withLeaveMode(LeaveMode mode) {
@@ -97,7 +113,49 @@ public record GlideSettings(
         sprintMultiplier,
         accelerationSeconds,
         noclipEnabled,
-        mode);
+        mode,
+        controlScheme,
+        hangBoatWithClick,
+        buildThroughGhast);
+  }
+
+  public GlideSettings withControlScheme(ControlScheme scheme) {
+    return new GlideSettings(
+        horizontalMultiplier,
+        verticalMultiplier,
+        sprintMultiplier,
+        accelerationSeconds,
+        noclipEnabled,
+        leaveMode,
+        scheme,
+        hangBoatWithClick,
+        buildThroughGhast);
+  }
+
+  public GlideSettings withHangBoatWithClick(boolean enabled) {
+    return new GlideSettings(
+        horizontalMultiplier,
+        verticalMultiplier,
+        sprintMultiplier,
+        accelerationSeconds,
+        noclipEnabled,
+        leaveMode,
+        controlScheme,
+        enabled,
+        buildThroughGhast);
+  }
+
+  public GlideSettings withBuildThroughGhast(boolean enabled) {
+    return new GlideSettings(
+        horizontalMultiplier,
+        verticalMultiplier,
+        sprintMultiplier,
+        accelerationSeconds,
+        noclipEnabled,
+        leaveMode,
+        controlScheme,
+        hangBoatWithClick,
+        enabled);
   }
 
   static double clamp(double value, double min, double max, double fallback) {

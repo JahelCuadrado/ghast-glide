@@ -19,7 +19,8 @@ import net.minecraft.world.phys.Vec3;
  *
  * <p>The ghast turns towards where it flies and only thrusts as much as it faces that way, speeds
  * up and brakes like default glide, and on arrival turns to face the caller before anchoring (a
- * caller whose leave mode is {@link LeaveMode#VANILLA} then gets it released to vanilla AI).
+ * caller whose leave mode is {@link LeaveMode#VANILLA} then gets it released to vanilla AI). A
+ * ghast already near the caller when called does not move: it only turns to face them.
  */
 public final class GhastCalls {
   public static final String OUT_OF_RANGE_MESSAGE = "message.ghastglide.ghast_out_of_range";
@@ -31,8 +32,11 @@ public final class GhastCalls {
    */
   static final int CALL_TIMEOUT_TICKS = 600;
 
-  /** Gap between the ghast's side and the caller (adult ghast centre ends 3 blocks away). */
-  static final double SIDE_CLEARANCE = 1.0;
+  /**
+   * Gap between the ghast's side and the caller (adult ghast centre ends 6 blocks away): close
+   * enough to board in a few steps without the ghast feeling glued to the player.
+   */
+  static final double SIDE_CLEARANCE = 4.0;
 
   /** Yaw error under which the ghast snaps to the wanted yaw (arrival facing is then exact). */
   static final float YAW_SNAP_DEGREES = 2.0F;
@@ -67,7 +71,13 @@ public final class GhastCalls {
     GhastAnchors.anchor(ghast, leaveMode);
     ghast.setAttached(
         GhastAttachments.CALL,
-        new GhastCall(player, noclip, leaveMode, CALL_TIMEOUT_TICKS, GhastMotion.AT_REST));
+        new GhastCall(
+            player,
+            noclip,
+            leaveMode,
+            isAlreadyNear(ghast, player),
+            CALL_TIMEOUT_TICKS,
+            GhastMotion.AT_REST));
     return CallResult.STARTED;
   }
 
@@ -91,7 +101,8 @@ public final class GhastCalls {
       GhastAnchors.anchor(ghast, call.leaveMode());
       return;
     }
-    Vec3 offset = targetBeside(ghast, caller).subtract(ghast.position());
+    Vec3 offset =
+        call.alreadyNear() ? Vec3.ZERO : targetBeside(ghast, caller).subtract(ghast.position());
     if (offset.length() <= GhastMotion.ARRIVAL_TOLERANCE) {
       float callerYaw =
           GhastMotion.yawOf(caller.getX() - ghast.getX(), caller.getZ() - ghast.getZ());
@@ -120,7 +131,23 @@ public final class GhastCalls {
     if (horizontal.lengthSqr() < MIN_HORIZONTAL_LENGTH_SQUARED) {
       horizontal = Vec3.directionFromRotation(0.0F, caller.getYRot());
     }
-    double sideDistance = ghast.getBbWidth() / 2.0 + SIDE_CLEARANCE;
-    return caller.position().add(horizontal.normalize().scale(sideDistance));
+    return caller.position().add(horizontal.normalize().scale(stopDistance(ghast)));
+  }
+
+  /**
+   * Within the stop distance horizontally and vertically overlapping the caller's feet (feet
+   * heights at most one ghast height apart): flying would only move the ghast away or onto them.
+   */
+  private static boolean isAlreadyNear(HappyGhast ghast, Player caller) {
+    double stopDistance = stopDistance(ghast);
+    double deltaX = ghast.getX() - caller.getX();
+    double deltaZ = ghast.getZ() - caller.getZ();
+    return deltaX * deltaX + deltaZ * deltaZ <= stopDistance * stopDistance
+        && Math.abs(ghast.getY() - caller.getY()) <= ghast.getBbHeight();
+  }
+
+  /** Horizontal distance from the caller to the ghast's centre where a call stops. */
+  private static double stopDistance(HappyGhast ghast) {
+    return ghast.getBbWidth() / 2.0 + SIDE_CLEARANCE;
   }
 }

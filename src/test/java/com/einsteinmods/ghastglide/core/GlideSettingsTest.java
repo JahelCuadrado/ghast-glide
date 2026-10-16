@@ -1,6 +1,7 @@
 package com.einsteinmods.ghastglide.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -11,7 +12,17 @@ class GlideSettingsTest {
   @Test
   void sanitizedClampsOutOfRangeValuesAndReplacesNan() {
     GlideSettings result =
-        new GlideSettings(50.0, -3.0, Double.NaN, 99.0, true, LeaveMode.NATURAL).sanitized();
+        new GlideSettings(
+                50.0,
+                -3.0,
+                Double.NaN,
+                99.0,
+                true,
+                LeaveMode.NATURAL,
+                ControlScheme.MOD,
+                true,
+                false)
+            .sanitized();
 
     assertEquals(GlideSettings.MAX_SPEED_MULTIPLIER, result.horizontalMultiplier());
     assertEquals(GlideSettings.MIN_SPEED_MULTIPLIER, result.verticalMultiplier());
@@ -23,17 +34,21 @@ class GlideSettingsTest {
   void missingOrInvalidAccelerationFallsBackToDefault() {
     for (double invalid : new double[] {0.0, -1.0, Double.NaN}) {
       GlideSettings result =
-          new GlideSettings(1.0, 1.0, 1.0, invalid, true, LeaveMode.NATURAL).sanitized();
+          new GlideSettings(
+                  1.0, 1.0, 1.0, invalid, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false)
+              .sanitized();
 
       assertEquals(GlideSettings.DEFAULT_ACCELERATION_SECONDS, result.accelerationSeconds());
     }
   }
 
   @Test
-  void defaultsAreRecommendedWithPassThroughAndNaturalLeaveMode() {
+  void defaultsAreRecommendedWithPassThroughNaturalLeaveModeBoatHangingAndNoBuildThrough() {
     assertSame(FlightPreset.RECOMMENDED, FlightPreset.matching(GlideSettings.DEFAULTS));
     assertTrue(GlideSettings.DEFAULTS.noclipEnabled());
     assertSame(LeaveMode.NATURAL, GlideSettings.DEFAULTS.leaveMode());
+    assertTrue(GlideSettings.DEFAULTS.hangBoatWithClick());
+    assertFalse(GlideSettings.DEFAULTS.buildThroughGhast());
   }
 
   @Test
@@ -46,9 +61,23 @@ class GlideSettingsTest {
   }
 
   @Test
+  void controlSchemeSurvivesSanitizingAndMissingOneBecomesModControls() {
+    assertSame(ControlScheme.MOD, GlideSettings.DEFAULTS.controlScheme());
+    for (ControlScheme scheme : ControlScheme.values()) {
+      assertSame(
+          scheme, GlideSettings.DEFAULTS.withControlScheme(scheme).sanitized().controlScheme());
+    }
+    assertSame(
+        ControlScheme.MOD,
+        GlideSettings.DEFAULTS.withControlScheme(null).sanitized().controlScheme());
+  }
+
+  @Test
   void tooShortAccelerationIsClampedToMinimum() {
     GlideSettings result =
-        new GlideSettings(1.0, 1.0, 1.0, 0.01, true, LeaveMode.NATURAL).sanitized();
+        new GlideSettings(
+                1.0, 1.0, 1.0, 0.01, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false)
+            .sanitized();
 
     assertEquals(GlideSettings.MIN_ACCELERATION_SECONDS, result.accelerationSeconds());
   }

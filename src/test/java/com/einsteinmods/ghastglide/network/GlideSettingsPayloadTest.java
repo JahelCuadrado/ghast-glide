@@ -2,6 +2,7 @@ package com.einsteinmods.ghastglide.network;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.einsteinmods.ghastglide.core.ControlScheme;
 import com.einsteinmods.ghastglide.core.GlideSettings;
 import com.einsteinmods.ghastglide.core.LeaveMode;
 import io.netty.buffer.Unpooled;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 class GlideSettingsPayloadTest {
   private static final int UNKNOWN_LEAVE_MODE_ID = 99;
+  private static final int UNKNOWN_CONTROL_SCHEME_ID = 99;
 
   private static GlideSettings roundTrip(GlideSettings settings) {
     RegistryFriendlyByteBuf buffer =
@@ -34,7 +36,30 @@ class GlideSettingsPayloadTest {
   }
 
   @Test
-  void unknownLeaveModeIdDecodesAsDefault() {
+  void roundTripKeepsEveryControlScheme() {
+    for (ControlScheme scheme : ControlScheme.values()) {
+      GlideSettings settings = GlideSettings.DEFAULTS.withControlScheme(scheme);
+
+      assertEquals(settings, roundTrip(settings));
+    }
+  }
+
+  @Test
+  void roundTripKeepsBoatHangingDisabled() {
+    GlideSettings settings = GlideSettings.DEFAULTS.withHangBoatWithClick(false);
+
+    assertEquals(settings, roundTrip(settings));
+  }
+
+  @Test
+  void roundTripKeepsBuildThroughGhastEnabled() {
+    GlideSettings settings = GlideSettings.DEFAULTS.withBuildThroughGhast(true);
+
+    assertEquals(settings, roundTrip(settings));
+  }
+
+  @Test
+  void unknownLeaveModeAndControlSchemeIdsDecodeAsDefault() {
     RegistryFriendlyByteBuf buffer =
         new RegistryFriendlyByteBuf(Unpooled.buffer(), RegistryAccess.EMPTY);
     GlideSettings defaults = GlideSettings.DEFAULTS;
@@ -44,8 +69,12 @@ class GlideSettingsPayloadTest {
     buffer.writeDouble(defaults.accelerationSeconds());
     buffer.writeBoolean(defaults.noclipEnabled());
     buffer.writeByte(UNKNOWN_LEAVE_MODE_ID);
+    buffer.writeByte(UNKNOWN_CONTROL_SCHEME_ID);
+    buffer.writeBoolean(defaults.hangBoatWithClick());
+    buffer.writeBoolean(defaults.buildThroughGhast());
 
-    assertEquals(
-        LeaveMode.DEFAULT, GlideSettingsPayload.CODEC.decode(buffer).settings().leaveMode());
+    GlideSettings decoded = GlideSettingsPayload.CODEC.decode(buffer).settings();
+    assertEquals(LeaveMode.DEFAULT, decoded.leaveMode());
+    assertEquals(ControlScheme.DEFAULT, decoded.controlScheme());
   }
 }

@@ -8,21 +8,26 @@ import org.junit.jupiter.api.Test;
 class MountMessageKeyTest {
   @Test
   void namesDismountKeyForPilotOnModdedServerWithBoundKey() {
-    assertTrue(MountMessageKey.namesDismountKey(true, true, true));
+    assertTrue(MountMessageKey.namesDismountKey(true, true, true, true));
   }
 
   @Test
   void keepsSneakForPassengersAndOtherVehicles() {
-    assertFalse(MountMessageKey.namesDismountKey(false, true, true));
+    assertFalse(MountMessageKey.namesDismountKey(false, true, true, true));
   }
 
   @Test
   void keepsSneakInClientOnlyModeOrBeforeServerPolicy() {
-    assertFalse(MountMessageKey.namesDismountKey(true, false, true));
+    assertFalse(MountMessageKey.namesDismountKey(true, false, true, true));
+  }
+
+  @Test
+  void keepsSneakWithVanillaControls() {
+    assertFalse(MountMessageKey.namesDismountKey(true, true, false, true));
   }
 
   @Test
   void keepsSneakWhenDismountKeyIsUnbound() {
-    assertFalse(MountMessageKey.namesDismountKey(true, true, false));
+    assertFalse(MountMessageKey.namesDismountKey(true, true, true, false));
   }
 }

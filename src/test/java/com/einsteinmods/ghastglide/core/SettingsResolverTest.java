@@ -11,7 +11,9 @@ class SettingsResolverTest {
 
   @Test
   void unrestrictedPolicyKeepsSettings() {
-    GlideSettings requested = new GlideSettings(10.0, 10.0, 5.0, 3.0, true, LeaveMode.NATURAL);
+    GlideSettings requested =
+        new GlideSettings(
+            10.0, 10.0, 5.0, 3.0, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
 
     GlideSettings effective = SettingsResolver.effective(requested, ServerPolicy.UNRESTRICTED);
 
@@ -20,7 +22,9 @@ class SettingsResolverTest {
 
   @Test
   void policyCapsHorizontalSpeedIncludingSprint() {
-    GlideSettings requested = new GlideSettings(6.0, 2.0, 5.0, 4.0, true, LeaveMode.NATURAL);
+    GlideSettings requested =
+        new GlideSettings(
+            6.0, 2.0, 5.0, 4.0, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
     ServerPolicy policy = new ServerPolicy(true, 12.0);
 
     GlideSettings effective = SettingsResolver.effective(requested, policy);
@@ -44,6 +48,22 @@ class SettingsResolverTest {
   }
 
   @Test
+  void boatHangingPassesThroughAnyPolicy() {
+    GlideSettings requested = GlideSettings.DEFAULTS.withHangBoatWithClick(false);
+
+    assertFalse(
+        SettingsResolver.effective(requested, ServerPolicy.WITHOUT_SERVER_MOD).hangBoatWithClick());
+  }
+
+  @Test
+  void buildThroughGhastPassesThroughAnyPolicy() {
+    GlideSettings requested = GlideSettings.DEFAULTS.withBuildThroughGhast(true);
+
+    assertTrue(
+        SettingsResolver.effective(requested, ServerPolicy.WITHOUT_SERVER_MOD).buildThroughGhast());
+  }
+
+  @Test
   void policyCanDisableNoclip() {
     GlideSettings effective =
         SettingsResolver.effective(GlideSettings.DEFAULTS, new ServerPolicy(false, 15.0));
@@ -54,7 +74,8 @@ class SettingsResolverTest {
   @Test
   void invalidValuesAreSanitized() {
     GlideSettings requested =
-        new GlideSettings(Double.NaN, -4.0, 99.0, 0.0, true, LeaveMode.NATURAL);
+        new GlideSettings(
+            Double.NaN, -4.0, 99.0, 0.0, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
 
     GlideSettings effective = SettingsResolver.effective(requested, ServerPolicy.UNRESTRICTED);
 
@@ -69,7 +90,15 @@ class SettingsResolverTest {
   void withoutServerModForcesNoclipOffAndCapsSpeedLikeDedicatedDefaults() {
     GlideSettings requested =
         new GlideSettings(
-            10.0, 20.0, 5.0, GlideSettings.DEFAULT_ACCELERATION_SECONDS, true, LeaveMode.NATURAL);
+            10.0,
+            20.0,
+            5.0,
+            GlideSettings.DEFAULT_ACCELERATION_SECONDS,
+            true,
+            LeaveMode.NATURAL,
+            ControlScheme.MOD,
+            true,
+            false);
 
     GlideSettings effective =
         SettingsResolver.effective(requested, ServerPolicy.WITHOUT_SERVER_MOD);

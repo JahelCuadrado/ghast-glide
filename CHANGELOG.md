@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.1.0 — 2026-10-16
+
+- **Hang a boat from your ghast:** while riding, right-click your ghast with a boat in hand and a
+  lead in your inventory, and a boat hangs below it, ready to carry friends or mobs (can be turned
+  off).
+- **Build through your ghast** (new option, off by default): place blocks where your ghast's body
+  is, so it no longer gets in the way when you build looking down.
+- **Vanilla controls option:** fly the way the base game does (look up or down to climb, Sneak
+  gets you off) while keeping pass-through blocks, calling and the other features.
+- **Calling your ghast** now stops it a few blocks away instead of right next to you; if it is
+  already close, it just turns to face you.
+- **Hiding the ghast in first person** now also hides the boats hanging from it and their ropes.
+- **Descending with Sneak** no longer crouches you: the camera stays steady.
+
 ## 1.0.0 — 2026-10-13
 
 First release for Minecraft 26.3 (Fabric). The Happy Ghast as it always should have been: a little bit of creative inside survival, to build comfortably anywhere.

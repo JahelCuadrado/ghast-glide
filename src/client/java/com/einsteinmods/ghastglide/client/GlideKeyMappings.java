@@ -59,7 +59,7 @@ public final class GlideKeyMappings {
     while (dismount.consumeClick()) {
       // Servers without the mod have no handler; vanilla sneak dismounts there.
       if (minecraft.player != null
-          && GlideRules.isGliding(minecraft.player)
+          && GlideRules.isPiloting(minecraft.player)
           && ClientPlayNetworking.canSend(DismountPayload.TYPE)) {
         ClientPlayNetworking.send(DismountPayload.INSTANCE);
       }

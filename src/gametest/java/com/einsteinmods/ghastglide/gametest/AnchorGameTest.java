@@ -37,7 +37,8 @@ import net.minecraft.world.phys.Vec3;
 /** Anchoring a dismounted ghast and calling it back, with AI enabled. */
 public final class AnchorGameTest {
   // The 8x8x8 test structure is encased in barriers, so the 4-block ghast (box x/z 0..4 here)
-  // flies diagonally to the far corner: it ends centred 3 blocks from the player, ~7.8 from start.
+  // flies diagonally towards the far corner: it ends centred 6 blocks from the player (~7.8 at the
+  // start), so it only flies ~1.8 blocks.
   private static final Vec3 GHAST_POSITION = new Vec3(2.0, 2.0, 2.0);
   private static final Vec3 NEAR_PLAYER_POSITION = new Vec3(7.5, 2.0, 7.5);
   // Vanilla keeps a dismounted ghast still for 10 ticks after a 60-tick load grace; later its
@@ -48,7 +49,8 @@ public final class AnchorGameTest {
   private static final int ANCHOR_CHECK_TICKS = 1200;
   private static final int BLOCKED_CHECK_TICKS = 60;
   private static final double MAX_ANCHOR_DRIFT = 0.5;
-  private static final double CALL_REACH = 4.0;
+  // Beyond the 6-block stop distance by less than a wall-blocked ghast (~6.9 away) is.
+  private static final double CALL_REACH = 6.5;
   private static final int WALL_X = 4;
   private static final int STRUCTURE_SIZE = 8;
 
@@ -62,6 +64,14 @@ public final class AnchorGameTest {
   private static final double SPEED_CHANGE_EPSILON = 1.0E-6;
   private static final int CALL_ARRIVAL_TICKS = 150;
   private static final int FACING_HOLD_TICKS = 200;
+  // Far call: 30 blocks above the usual start (~31 from the player; sky access, no barrier roof).
+  private static final Vec3 HIGH_GHAST_POSITION = GHAST_POSITION.add(0.0, 30.0, 0.0);
+  private static final int FAR_CALL_ARRIVAL_TICKS = 300;
+  private static final double CALL_STOP_DISTANCE = 6.0;
+  private static final double STOP_DISTANCE_TOLERANCE = 0.1;
+  // Near call: the ghast centre starts ~2.8 blocks from the player, inside the stop distance.
+  private static final Vec3 NEAR_GHAST_POSITION = new Vec3(5.5, 2.0, 5.5);
+  private static final double MAX_NEAR_CALL_DISPLACEMENT = 0.01;
 
   // Water: sources fill the structure up to this layer; the ghast box (y 2..6) starts submerged.
   private static final int WATER_TOP_LAYER = 6;
@@ -343,6 +353,48 @@ public final class AnchorGameTest {
     helper.assertTrue(
         GhastCalls.requestCall(player, helper.getLevel()) == CallResult.STARTED, "call must start");
     succeedWhenGhastNear(helper, player);
+  }
+
+  @GameTest(maxTicks = FAR_CALL_ARRIVAL_TICKS, skyAccess = true)
+  public void farCallStopsAtStopDistance(GameTestHelper helper) {
+    Dismounted dismounted = dismount(helper, HIGH_GHAST_POSITION);
+    HappyGhast ghast = dismounted.ghast();
+    Player player = dismounted.rider();
+    player.setPos(helper.absoluteVec(NEAR_PLAYER_POSITION));
+
+    helper.assertTrue(
+        GhastCalls.requestCall(player, helper.getLevel()) == CallResult.STARTED, "call must start");
+    helper.succeedWhen(
+        () -> {
+          helper.assertFalse(ghast.hasAttached(GhastAttachments.CALL), "call must finish");
+          double distance = horizontalDistance(ghast.position(), player.position());
+          helper.assertTrue(
+              Math.abs(distance - CALL_STOP_DISTANCE) <= STOP_DISTANCE_TOLERANCE,
+              "ghast stopped " + distance + " away");
+          helper.assertTrue(GhastAnchors.isAnchored(ghast), "arrived ghast must anchor");
+        });
+  }
+
+  @GameTest(maxTicks = CALL_ARRIVAL_TICKS)
+  public void callWhenAlreadyNearOnlyTurnsToCaller(GameTestHelper helper) {
+    Dismounted dismounted = dismount(helper, NEAR_GHAST_POSITION);
+    HappyGhast ghast = dismounted.ghast();
+    Player player = dismounted.rider();
+    player.setPos(helper.absoluteVec(NEAR_PLAYER_POSITION));
+    // Drift would move it after anchoring; only the call must keep it in place.
+    ServerGlideSessions.update(
+        player.getUUID(), GlideSettings.DEFAULTS.withLeaveMode(LeaveMode.STILL));
+    face(ghast, FACING_AWAY_YAW);
+    Vec3 start = ghast.position();
+
+    helper.assertTrue(
+        GhastCalls.requestCall(player, helper.getLevel()) == CallResult.STARTED, "call must start");
+    helper.onEachTick(
+        () -> {
+          double moved = ghast.position().distanceTo(start);
+          helper.assertTrue(moved <= MAX_NEAR_CALL_DISPLACEMENT, "near ghast moved " + moved);
+        });
+    helper.succeedWhen(() -> assertFacesAnchored(helper, ghast, player));
   }
 
   @GameTest(maxTicks = BLOCKED_CHECK_TICKS + 20)
@@ -649,6 +701,10 @@ public final class AnchorGameTest {
     ghast.setYRot(yaw);
     ghast.setYBodyRot(yaw);
     ghast.setYHeadRot(yaw);
+  }
+
+  private static double horizontalDistance(Vec3 from, Vec3 to) {
+    return Math.hypot(to.x - from.x, to.z - from.z);
   }
 
   /** Absolute angle between {@code yaw} and the horizontal direction (dx, dz), in degrees. */

@@ -1,5 +1,6 @@
 package com.einsteinmods.ghastglide.gametest;
 
+import com.einsteinmods.ghastglide.core.ControlScheme;
 import com.einsteinmods.ghastglide.core.GlideSettings;
 import com.einsteinmods.ghastglide.core.ServerPolicy;
 import com.einsteinmods.ghastglide.glide.ServerGlideSessions;
@@ -35,6 +36,19 @@ public final class NoclipGameTest {
   @GameTest(maxTicks = 20)
   public void ghastPassesWallThatOnlyItsBodyTouches(GameTestHelper helper) {
     HappyGhast ghast = mountedGhast(helper, GlideSettings.DEFAULTS);
+    buildWall(helper, GHAST_TOP_Y);
+
+    double moved = moveForward(ghast);
+
+    helper.assertTrue(
+        Math.abs(moved - STEP) < EPSILON, "ghast should move full step, moved " + moved);
+    helper.succeed();
+  }
+
+  @GameTest(maxTicks = 20)
+  public void vanillaControlsStillPassWallThatOnlyTheBodyTouches(GameTestHelper helper) {
+    HappyGhast ghast =
+        mountedGhast(helper, GlideSettings.DEFAULTS.withControlScheme(ControlScheme.VANILLA));
     buildWall(helper, GHAST_TOP_Y);
 
     double moved = moveForward(ghast);

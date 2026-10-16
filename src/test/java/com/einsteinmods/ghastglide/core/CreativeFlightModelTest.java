@@ -24,7 +24,10 @@ class CreativeFlightModelTest {
         defaults.sprintMultiplier(),
         seconds,
         defaults.noclipEnabled(),
-        defaults.leaveMode());
+        defaults.leaveMode(),
+        ControlScheme.MOD,
+        true,
+        false);
   }
 
   private static Motion tick(Motion velocity, FlightInput input, GlideSettings settings) {
@@ -124,7 +127,9 @@ class CreativeFlightModelTest {
 
   @Test
   void sprintAndHorizontalMultiplierScaleHorizontalSpeed() {
-    GlideSettings settings = new GlideSettings(3.0, 1.0, 2.0, 2.0, true, LeaveMode.NATURAL);
+    GlideSettings settings =
+        new GlideSettings(
+            3.0, 1.0, 2.0, 2.0, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
 
     Motion result = CreativeFlightModel.accelerate(Motion.ZERO, forward(true), settings);
 
@@ -146,7 +151,9 @@ class CreativeFlightModelTest {
 
   @Test
   void ascendAndDescendUseVerticalMultiplierAndCancelOut() {
-    GlideSettings settings = new GlideSettings(1.0, 2.0, 2.0, 2.0, true, LeaveMode.NATURAL);
+    GlideSettings settings =
+        new GlideSettings(
+            1.0, 2.0, 2.0, 2.0, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
     FlightInput up = new FlightInput(0.0F, 0.0F, true, false, false, NO_YAW);
     FlightInput both = new FlightInput(0.0F, 0.0F, true, true, false, NO_YAW);
 
@@ -248,7 +255,9 @@ class CreativeFlightModelTest {
 
   @Test
   void pitchSteeredWithLevelLookEqualsCreativeVariant() {
-    GlideSettings settings = new GlideSettings(2.5, 1.5, 3.0, 2.0, false, LeaveMode.NATURAL);
+    GlideSettings settings =
+        new GlideSettings(
+            2.5, 1.5, 3.0, 2.0, false, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
     Motion current = new Motion(0.1, -0.2, 0.3);
     FlightInput[] inputs = {
       new FlightInput(0.0F, 1.0F, false, false, false, 37.0F),
@@ -286,7 +295,10 @@ class CreativeFlightModelTest {
                 GlideSettings.MAX_SPRINT_MULTIPLIER,
                 GlideSettings.DEFAULT_ACCELERATION_SECONDS,
                 false,
-                LeaveMode.NATURAL),
+                LeaveMode.NATURAL,
+                ControlScheme.MOD,
+                true,
+                false),
             ServerPolicy.WITHOUT_SERVER_MOD);
     FlightInput climb = new FlightInput(0.0F, 1.0F, true, false, true, NO_YAW, -90.0F);
 

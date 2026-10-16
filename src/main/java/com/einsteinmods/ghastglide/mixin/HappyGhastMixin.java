@@ -13,7 +13,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Creative-flight travel and collision-safe turning while a gliding player controls the ghast. */
+/**
+ * Creative-flight travel (mod controls only) and collision-safe turning while a gliding player
+ * controls the ghast.
+ */
 @Mixin(HappyGhast.class)
 abstract class HappyGhastMixin implements PhasingGhast {
   @Unique private boolean ghastglide$phasing;
@@ -26,7 +29,8 @@ abstract class HappyGhastMixin implements PhasingGhast {
       return;
     }
     GlideSettings settings = GlideRules.settingsFor(rider);
-    if (settings != null) {
+    // Vanilla controls keep vanilla HappyGhast#travel (look to climb, vanilla speeds).
+    if (settings != null && GlideRules.usesModControls(settings)) {
       GlideMovement.travel(self, rider, settings);
       ci.cancel();
     }

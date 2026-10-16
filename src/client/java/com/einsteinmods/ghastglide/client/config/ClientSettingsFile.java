@@ -1,5 +1,6 @@
 package com.einsteinmods.ghastglide.client.config;
 
+import com.einsteinmods.ghastglide.core.ControlScheme;
 import com.einsteinmods.ghastglide.core.FlightPreset;
 import com.einsteinmods.ghastglide.core.GlideSettings;
 import com.einsteinmods.ghastglide.core.LeaveMode;
@@ -21,6 +22,15 @@ import org.jspecify.annotations.Nullable;
  * leaveMode}. On load a schema 5 file maps true to {@code NATURAL} and false to {@code STILL};
  * older files, a missing or an unknown mode (Gson reads both as null) get the default ({@code
  * NATURAL}). Saving writes only {@code leaveMode} (Gson skips the null {@code idleDriftEnabled}).
+ *
+ * <p>Schema 7 adds {@code hangBoatWithClick}; older files lack it and Gson reads the boxed value as
+ * null, which loads as {@code true}, its default.
+ *
+ * <p>Schema 8 adds {@code buildThroughGhast}; older files lack it and Gson reads the boxed value as
+ * null, which loads as {@code false}, its default.
+ *
+ * <p>{@code controlScheme} needs no schema bump: older files lack it, and a missing or an unknown
+ * scheme (Gson reads both as null) becomes the default ({@code MOD}).
  */
 public record ClientSettingsFile(
     int schemaVersion,
@@ -32,8 +42,11 @@ public record ClientSettingsFile(
     boolean noclipEnabled,
     @Nullable Boolean idleDriftEnabled,
     @Nullable LeaveMode leaveMode,
-    boolean hideGhastInFirstPerson) {
-  public static final int CURRENT_SCHEMA_VERSION = 6;
+    @Nullable ControlScheme controlScheme,
+    boolean hideGhastInFirstPerson,
+    @Nullable Boolean hangBoatWithClick,
+    @Nullable Boolean buildThroughGhast) {
+  public static final int CURRENT_SCHEMA_VERSION = 8;
   public static final String FILE_NAME = "ghastglide.json";
 
   /** First schema with the {@code preset} field. */
@@ -56,7 +69,10 @@ public record ClientSettingsFile(
         settings.noclipEnabled(),
         null,
         settings.leaveMode(),
-        preferences.hideGhastInFirstPerson());
+        settings.controlScheme(),
+        preferences.hideGhastInFirstPerson(),
+        settings.hangBoatWithClick(),
+        settings.buildThroughGhast());
   }
 
   /**
@@ -71,7 +87,14 @@ public record ClientSettingsFile(
                 sprintMultiplier,
                 accelerationSeconds,
                 noclipEnabled,
-                storedLeaveMode())
+                storedLeaveMode(),
+                controlScheme,
+                hangBoatWithClick == null
+                    ? GlideSettings.DEFAULTS.hangBoatWithClick()
+                    : hangBoatWithClick,
+                buildThroughGhast == null
+                    ? GlideSettings.DEFAULTS.buildThroughGhast()
+                    : buildThroughGhast)
             .sanitized();
     if (schemaVersion < PRESET_SCHEMA_VERSION || preset == null) {
       return stored;

@@ -21,6 +21,9 @@ public final class SettingsResolver {
         sprint,
         settings.accelerationSeconds(),
         settings.noclipEnabled() && limits.allowNoclip(),
-        settings.leaveMode());
+        settings.leaveMode(),
+        settings.controlScheme(),
+        settings.hangBoatWithClick(),
+        settings.buildThroughGhast());
   }
 }

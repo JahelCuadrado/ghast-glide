@@ -1,5 +1,6 @@
 package com.einsteinmods.ghastglide.client;
 
+import com.einsteinmods.ghastglide.glide.GlideRules;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
@@ -7,9 +8,10 @@ import net.minecraft.world.entity.animal.happyghast.HappyGhast;
 
 /**
  * Picks the key named in vanilla's "mount.onboard" message ("Press %s to dismount"). On a server
- * with the mod the pilot of a Happy Ghast dismounts with the mod's key, because sneak descends
- * there; everywhere else sneak really dismounts, so vanilla's text stays. An unbound dismount key
- * also keeps vanilla's text: there is no key to name, and that is the player's binding choice.
+ * with the mod the pilot of a Happy Ghast flying with the mod's controls dismounts with the mod's
+ * key, because sneak descends there; everywhere else (vanilla controls included) sneak really
+ * dismounts, so vanilla's text stays. An unbound dismount key also keeps vanilla's text: there is
+ * no key to name, and that is the player's binding choice.
  */
 public final class MountMessageKey {
   private MountMessageKey() {}
@@ -21,17 +23,21 @@ public final class MountMessageKey {
         namesDismountKey(
             isHappyGhastPilot(vehicle, passenger),
             GhastGlideClient.state().hasModdedServer(),
+            GlideRules.usesModControls(GhastGlideClient.state().requested()),
             !dismount.isUnbound());
     return namesDismountKey ? dismount.getTranslatedKeyMessage() : vanillaKeyName;
   }
 
   /**
    * Pure decision: name the dismount key only for the pilot of a Happy Ghast on a server with the
-   * mod (glide replaces sneak there) and only if that key is bound.
+   * mod flying with the mod's controls (glide replaces sneak there) and only if that key is bound.
    */
   static boolean namesDismountKey(
-      boolean happyGhastPilot, boolean moddedServer, boolean dismountKeyBound) {
-    return happyGhastPilot && moddedServer && dismountKeyBound;
+      boolean happyGhastPilot,
+      boolean moddedServer,
+      boolean modControls,
+      boolean dismountKeyBound) {
+    return happyGhastPilot && moddedServer && modControls && dismountKeyBound;
   }
 
   /**

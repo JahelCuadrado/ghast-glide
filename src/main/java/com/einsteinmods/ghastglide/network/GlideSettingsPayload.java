@@ -1,6 +1,7 @@
 package com.einsteinmods.ghastglide.network;
 
 import com.einsteinmods.ghastglide.GhastGlide;
+import com.einsteinmods.ghastglide.core.ControlScheme;
 import com.einsteinmods.ghastglide.core.GlideSettings;
 import com.einsteinmods.ghastglide.core.LeaveMode;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -21,6 +22,9 @@ public record GlideSettingsPayload(GlideSettings settings) implements CustomPack
             buffer.writeDouble(value.accelerationSeconds());
             buffer.writeBoolean(value.noclipEnabled());
             buffer.writeByte(value.leaveMode().id());
+            buffer.writeByte(value.controlScheme().id());
+            buffer.writeBoolean(value.hangBoatWithClick());
+            buffer.writeBoolean(value.buildThroughGhast());
           },
           buffer ->
               new GlideSettingsPayload(
@@ -30,7 +34,10 @@ public record GlideSettingsPayload(GlideSettings settings) implements CustomPack
                           buffer.readDouble(),
                           buffer.readDouble(),
                           buffer.readBoolean(),
-                          LeaveMode.fromId(buffer.readByte()))
+                          LeaveMode.fromId(buffer.readByte()),
+                          ControlScheme.fromId(buffer.readByte()),
+                          buffer.readBoolean(),
+                          buffer.readBoolean())
                       .sanitized()));
 
   @Override

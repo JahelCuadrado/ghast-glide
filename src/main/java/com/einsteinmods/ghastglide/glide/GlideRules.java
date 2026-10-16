@@ -2,6 +2,7 @@ package com.einsteinmods.ghastglide.glide;
 
 import com.einsteinmods.ghastglide.anchor.GhastAnchors;
 import com.einsteinmods.ghastglide.anchor.GhastCalls;
+import com.einsteinmods.ghastglide.core.ControlScheme;
 import com.einsteinmods.ghastglide.core.FlightInput;
 import com.einsteinmods.ghastglide.core.GlideSettings;
 import net.minecraft.world.entity.Entity;
@@ -41,12 +42,32 @@ public final class GlideRules {
         || GhastAnchors.isGettingUnstuck(ghast);
   }
 
-  /** True when {@code rider} is flying a ghast with glide, so sneak means "descend". */
+  /**
+   * True when {@code rider} is flying a ghast with glide and the mod's controls, so sneak means
+   * "descend". With {@link ControlScheme#VANILLA} sneak dismounts as in vanilla.
+   */
   public static boolean isGliding(Player rider) {
+    GlideSettings settings = pilotSettings(rider);
+    return settings != null && usesModControls(settings);
+  }
+
+  /** True when {@code rider} flies a ghast with glide, whatever the control scheme. */
+  public static boolean isPiloting(Player rider) {
+    return pilotSettings(rider) != null;
+  }
+
+  /**
+   * True when {@code settings} replace vanilla flight with the mod's ({@code HappyGhast#travel}).
+   */
+  public static boolean usesModControls(GlideSettings settings) {
+    return settings.controlScheme() == ControlScheme.MOD;
+  }
+
+  private static @Nullable GlideSettings pilotSettings(Player rider) {
     Entity vehicle = rider.getVehicle();
-    return vehicle instanceof HappyGhast ghast
-        && ghast.getControllingPassenger() == rider
-        && settingsFor(rider) != null;
+    return vehicle instanceof HappyGhast ghast && ghast.getControllingPassenger() == rider
+        ? settingsFor(rider)
+        : null;
   }
 
   public static FlightInput input(Player rider) {
