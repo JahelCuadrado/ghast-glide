@@ -3,11 +3,16 @@
   "package": "com.einsteinmods.ghastglide.client.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
+    "AbstractBoatRendererMixin",
     "ClientPacketListenerMixin",
     "EntityRendererMixin",
+    "EntityRenderStateMixin",
+    "EquipmentLayerRendererMixin",
     "LevelExtractorMixin",
     "LevelExtractorSectionMixin",
-    "MinecraftMixin"
+    "LivingEntityRendererMixin",
+    "MinecraftMixin",
+    "RopesLayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -15,8 +15,11 @@ import org.jspecify.annotations.Nullable;
  * "CUSTOM"}. Older files have no preset: their speeds are used as stored, which reads as {@code
  * RECOMMENDED} when they equal the defaults and {@code CUSTOM} otherwise.
  *
- * <p>Schema 4 adds the client-only {@link ClientPreferences} ({@code hideGhastInFirstPerson});
- * older files lack it and Gson reads it as {@code false}, its default.
+ * <p>Schema 4 added the client-only boolean {@code hideGhastInFirstPerson}; schema 10 replaces it
+ * with {@code ghastFirstPerson} and {@code cargoFirstPerson} ({@link ClientPreferences}). On load
+ * an older file maps true to {@code HIDDEN} for both and false or missing to {@code NORMAL}; a
+ * missing or unknown mode (Gson reads both as null) becomes {@code NORMAL}. Saving writes only the
+ * modes (Gson skips the null {@code hideGhastInFirstPerson}).
  *
  * <p>Schema 5 added the boolean {@code idleDriftEnabled}; schema 6 replaces it with {@code
  * leaveMode}. On load a schema 5 file maps true to {@code NATURAL} and false to {@code STILL};
@@ -28,6 +31,9 @@ import org.jspecify.annotations.Nullable;
  *
  * <p>Schema 8 adds {@code buildThroughGhast}; older files lack it and Gson reads the boxed value as
  * null, which loads as {@code false}, its default.
+ *
+ * <p>Schema 9 adds {@code mineAtNormalSpeed} and {@code passThroughEntities}; older files lack them
+ * and Gson reads the boxed values as null, which load as {@code true}, their default.
  *
  * <p>{@code controlScheme} needs no schema bump: older files lack it, and a missing or an unknown
  * scheme (Gson reads both as null) becomes the default ({@code MOD}).
@@ -43,10 +49,14 @@ public record ClientSettingsFile(
     @Nullable Boolean idleDriftEnabled,
     @Nullable LeaveMode leaveMode,
     @Nullable ControlScheme controlScheme,
-    boolean hideGhastInFirstPerson,
+    @Nullable Boolean hideGhastInFirstPerson,
     @Nullable Boolean hangBoatWithClick,
-    @Nullable Boolean buildThroughGhast) {
-  public static final int CURRENT_SCHEMA_VERSION = 8;
+    @Nullable Boolean buildThroughGhast,
+    @Nullable Boolean mineAtNormalSpeed,
+    @Nullable Boolean passThroughEntities,
+    @Nullable FirstPersonVisibility ghastFirstPerson,
+    @Nullable FirstPersonVisibility cargoFirstPerson) {
+  public static final int CURRENT_SCHEMA_VERSION = 10;
   public static final String FILE_NAME = "ghastglide.json";
 
   /** First schema with the {@code preset} field. */
@@ -54,6 +64,9 @@ public record ClientSettingsFile(
 
   /** The only schema with the {@code idleDriftEnabled} field. */
   private static final int IDLE_DRIFT_SCHEMA_VERSION = 5;
+
+  /** First schema with {@code ghastFirstPerson} and {@code cargoFirstPerson}. */
+  private static final int VISIBILITY_SCHEMA_VERSION = 10;
 
   public static final ClientSettingsFile DEFAULTS =
       from(GlideSettings.DEFAULTS, ClientPreferences.DEFAULTS);
@@ -70,9 +83,13 @@ public record ClientSettingsFile(
         null,
         settings.leaveMode(),
         settings.controlScheme(),
-        preferences.hideGhastInFirstPerson(),
+        null,
         settings.hangBoatWithClick(),
-        settings.buildThroughGhast());
+        settings.buildThroughGhast(),
+        settings.mineAtNormalSpeed(),
+        settings.passThroughEntities(),
+        preferences.ghastFirstPerson(),
+        preferences.cargoFirstPerson());
   }
 
   /**
@@ -94,7 +111,13 @@ public record ClientSettingsFile(
                     : hangBoatWithClick,
                 buildThroughGhast == null
                     ? GlideSettings.DEFAULTS.buildThroughGhast()
-                    : buildThroughGhast)
+                    : buildThroughGhast,
+                mineAtNormalSpeed == null
+                    ? GlideSettings.DEFAULTS.mineAtNormalSpeed()
+                    : mineAtNormalSpeed,
+                passThroughEntities == null
+                    ? GlideSettings.DEFAULTS.passThroughEntities()
+                    : passThroughEntities)
             .sanitized();
     if (schemaVersion < PRESET_SCHEMA_VERSION || preset == null) {
       return stored;
@@ -113,6 +136,17 @@ public record ClientSettingsFile(
   }
 
   public ClientPreferences toPreferences() {
-    return new ClientPreferences(hideGhastInFirstPerson);
+    if (schemaVersion < VISIBILITY_SCHEMA_VERSION) {
+      FirstPersonVisibility legacy =
+          Boolean.TRUE.equals(hideGhastInFirstPerson)
+              ? FirstPersonVisibility.HIDDEN
+              : FirstPersonVisibility.DEFAULT;
+      return new ClientPreferences(legacy, legacy);
+    }
+    return new ClientPreferences(orDefault(ghastFirstPerson), orDefault(cargoFirstPerson));
+  }
+
+  private static FirstPersonVisibility orDefault(@Nullable FirstPersonVisibility visibility) {
+    return visibility == null ? FirstPersonVisibility.DEFAULT : visibility;
   }
 }

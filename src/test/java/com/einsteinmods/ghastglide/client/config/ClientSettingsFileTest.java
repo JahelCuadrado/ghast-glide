@@ -82,6 +82,63 @@ class ClientSettingsFileTest {
       }
       """;
 
+  private static final String SCHEMA_8_JSON =
+      """
+      {
+        "schemaVersion": 8,
+        "preset": "RECOMMENDED",
+        "horizontalMultiplier": 0.5934,
+        "verticalMultiplier": 1.0,
+        "sprintMultiplier": 1.5,
+        "accelerationSeconds": 2.0,
+        "noclipEnabled": true,
+        "leaveMode": "NATURAL",
+        "controlScheme": "MOD",
+        "hideGhastInFirstPerson": false,
+        "hangBoatWithClick": true,
+        "buildThroughGhast": true
+      }
+      """;
+
+  private static final String SCHEMA_9_HIDDEN_JSON =
+      """
+      {
+        "schemaVersion": 9,
+        "preset": "RECOMMENDED",
+        "horizontalMultiplier": 0.5934,
+        "verticalMultiplier": 1.0,
+        "sprintMultiplier": 1.5,
+        "accelerationSeconds": 2.0,
+        "noclipEnabled": true,
+        "leaveMode": "NATURAL",
+        "controlScheme": "MOD",
+        "hideGhastInFirstPerson": true,
+        "hangBoatWithClick": true,
+        "buildThroughGhast": false,
+        "mineAtNormalSpeed": true,
+        "passThroughEntities": true
+      }
+      """;
+
+  private static final String SCHEMA_10_UNKNOWN_VISIBILITY_JSON =
+      """
+      {
+        "schemaVersion": 10,
+        "preset": "RECOMMENDED",
+        "horizontalMultiplier": 0.5934,
+        "verticalMultiplier": 1.0,
+        "sprintMultiplier": 1.5,
+        "accelerationSeconds": 2.0,
+        "noclipEnabled": true,
+        "hideGhastInFirstPerson": true,
+        "ghastFirstPerson": "GLASS",
+        "cargoFirstPerson": "SEMI_TRANSPARENT"
+      }
+      """;
+
+  private static final ClientPreferences HIDDEN_BOTH =
+      new ClientPreferences(FirstPersonVisibility.HIDDEN, FirstPersonVisibility.HIDDEN);
+
   private static final String SCHEMA_3_CALM_JSON =
       """
       {
@@ -168,7 +225,17 @@ class ClientSettingsFileTest {
   void schemaTwoOtherValuesMigrateToCustom(@TempDir Path directory) throws IOException {
     GlideSettings custom =
         new GlideSettings(
-            2.0, 1.5, 3.0, 1.0, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
+            2.0,
+            1.5,
+            3.0,
+            1.0,
+            true,
+            LeaveMode.NATURAL,
+            ControlScheme.MOD,
+            true,
+            false,
+            true,
+            true);
 
     GlideSettings settings = load(directory, schemaTwo(custom)).toSettings();
 
@@ -193,7 +260,17 @@ class ClientSettingsFileTest {
 
     assertEquals(
         new GlideSettings(
-            2.0, 1.5, 3.0, 1.0, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false),
+            2.0,
+            1.5,
+            3.0,
+            1.0,
+            true,
+            LeaveMode.NATURAL,
+            ControlScheme.MOD,
+            true,
+            false,
+            true,
+            true),
         settings);
   }
 
@@ -209,7 +286,17 @@ class ClientSettingsFileTest {
 
     assertEquals(
         new GlideSettings(
-            2.0, 1.5, 3.0, 2.0, false, LeaveMode.NATURAL, ControlScheme.MOD, true, false),
+            2.0,
+            1.5,
+            3.0,
+            2.0,
+            false,
+            LeaveMode.NATURAL,
+            ControlScheme.MOD,
+            true,
+            false,
+            true,
+            true),
         settings);
     assertEquals(GlideSettings.DEFAULT_ACCELERATION_SECONDS, settings.accelerationSeconds());
   }
@@ -221,7 +308,17 @@ class ClientSettingsFileTest {
         new JsonConfigFile<>(path, ClientSettingsFile.class, ClientSettingsFile.DEFAULTS);
     GlideSettings saved =
         new GlideSettings(
-            1.0, 1.0, 1.5, 0.7, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
+            1.0,
+            1.0,
+            1.5,
+            0.7,
+            true,
+            LeaveMode.NATURAL,
+            ControlScheme.MOD,
+            true,
+            false,
+            true,
+            true);
 
     file.save(ClientSettingsFile.from(saved, ClientPreferences.DEFAULTS));
 
@@ -238,7 +335,17 @@ class ClientSettingsFileTest {
       GlideSettings saved =
           preset.applyTo(
               new GlideSettings(
-                  2.0, 1.5, 3.0, 1.0, false, LeaveMode.NATURAL, ControlScheme.MOD, true, false));
+                  2.0,
+                  1.5,
+                  3.0,
+                  1.0,
+                  false,
+                  LeaveMode.NATURAL,
+                  ControlScheme.MOD,
+                  true,
+                  false,
+                  true,
+                  true));
       file.save(ClientSettingsFile.from(saved, ClientPreferences.DEFAULTS));
 
       ClientSettingsFile loaded = file.load();
@@ -255,7 +362,7 @@ class ClientSettingsFileTest {
     assertSame(LeaveMode.NATURAL, settings.leaveMode());
     assertFalse(settings.noclipEnabled());
     assertSame(FlightPreset.FAST, FlightPreset.matching(settings));
-    assertTrue(loaded.toPreferences().hideGhastInFirstPerson());
+    assertEquals(HIDDEN_BOTH, loaded.toPreferences());
     ClientSettingsFile migrated = ClientSettingsFile.from(settings, loaded.toPreferences());
     assertEquals(ClientSettingsFile.CURRENT_SCHEMA_VERSION, migrated.schemaVersion());
     assertSame(LeaveMode.NATURAL, migrated.leaveMode());
@@ -308,6 +415,40 @@ class ClientSettingsFileTest {
     JsonConfigFile<ClientSettingsFile> file =
         new JsonConfigFile<>(path, ClientSettingsFile.class, ClientSettingsFile.DEFAULTS);
     GlideSettings saved = GlideSettings.DEFAULTS.withBuildThroughGhast(true);
+
+    file.save(ClientSettingsFile.from(saved, ClientPreferences.DEFAULTS));
+
+    assertEquals(saved, file.load().toSettings());
+  }
+
+  @Test
+  void schemaEightFileLoadsMiningAndPassingThroughEntities(@TempDir Path directory)
+      throws IOException {
+    GlideSettings settings = load(directory, SCHEMA_8_JSON).toSettings();
+
+    assertTrue(settings.mineAtNormalSpeed());
+    assertTrue(settings.passThroughEntities());
+    assertTrue(settings.buildThroughGhast());
+  }
+
+  @Test
+  void roundTripKeepsMiningAtNormalSpeedDisabled(@TempDir Path directory) {
+    Path path = directory.resolve(ClientSettingsFile.FILE_NAME);
+    JsonConfigFile<ClientSettingsFile> file =
+        new JsonConfigFile<>(path, ClientSettingsFile.class, ClientSettingsFile.DEFAULTS);
+    GlideSettings saved = GlideSettings.DEFAULTS.withMineAtNormalSpeed(false);
+
+    file.save(ClientSettingsFile.from(saved, ClientPreferences.DEFAULTS));
+
+    assertEquals(saved, file.load().toSettings());
+  }
+
+  @Test
+  void roundTripKeepsPassThroughEntitiesDisabled(@TempDir Path directory) {
+    Path path = directory.resolve(ClientSettingsFile.FILE_NAME);
+    JsonConfigFile<ClientSettingsFile> file =
+        new JsonConfigFile<>(path, ClientSettingsFile.class, ClientSettingsFile.DEFAULTS);
+    GlideSettings saved = GlideSettings.DEFAULTS.withPassThroughEntities(false);
 
     file.save(ClientSettingsFile.from(saved, ClientPreferences.DEFAULTS));
 
@@ -374,14 +515,14 @@ class ClientSettingsFileTest {
     assertSame(FlightPreset.RECOMMENDED, FlightPreset.matching(settings));
     assertTrue(settings.noclipEnabled());
     assertSame(LeaveMode.NATURAL, settings.leaveMode());
-    assertFalse(ClientSettingsFile.DEFAULTS.toPreferences().hideGhastInFirstPerson());
+    assertEquals(ClientPreferences.DEFAULTS, ClientSettingsFile.DEFAULTS.toPreferences());
   }
 
   @Test
   void schemaThreeMigratesWithGhastShown(@TempDir Path directory) throws IOException {
     ClientSettingsFile loaded = load(directory, SCHEMA_3_CALM_JSON);
 
-    assertFalse(loaded.toPreferences().hideGhastInFirstPerson());
+    assertEquals(ClientPreferences.DEFAULTS, loaded.toPreferences());
     GlideSettings settings = loaded.toSettings();
     assertSame(FlightPreset.CALM, FlightPreset.matching(settings));
     assertTrue(settings.noclipEnabled());
@@ -394,17 +535,52 @@ class ClientSettingsFileTest {
     Path path = directory.resolve(ClientSettingsFile.FILE_NAME);
     JsonConfigFile<ClientSettingsFile> file =
         new JsonConfigFile<>(path, ClientSettingsFile.class, ClientSettingsFile.DEFAULTS);
-    ClientPreferences hidden = new ClientPreferences(true);
+    for (FirstPersonVisibility ghast : FirstPersonVisibility.values()) {
+      for (FirstPersonVisibility cargo : FirstPersonVisibility.values()) {
+        ClientPreferences preferences = new ClientPreferences(ghast, cargo);
 
-    file.save(ClientSettingsFile.from(GlideSettings.DEFAULTS, hidden));
+        file.save(ClientSettingsFile.from(GlideSettings.DEFAULTS, preferences));
 
-    ClientSettingsFile loaded = file.load();
-    assertEquals(hidden, loaded.toPreferences());
-    assertEquals(GlideSettings.DEFAULTS, loaded.toSettings());
+        ClientSettingsFile loaded = file.load();
+        assertEquals(preferences, loaded.toPreferences());
+        assertNull(loaded.hideGhastInFirstPerson());
+        assertEquals(GlideSettings.DEFAULTS, loaded.toSettings());
+      }
+    }
   }
 
   @Test
-  void defaultsShowTheGhast() {
-    assertFalse(ClientSettingsFile.DEFAULTS.toPreferences().hideGhastInFirstPerson());
+  void defaultsShowTheGhastAndCargo() {
+    ClientPreferences preferences = ClientSettingsFile.DEFAULTS.toPreferences();
+
+    assertSame(FirstPersonVisibility.NORMAL, preferences.ghastFirstPerson());
+    assertSame(FirstPersonVisibility.NORMAL, preferences.cargoFirstPerson());
+    assertFalse(preferences.changesFirstPerson());
+  }
+
+  @Test
+  void schemaNineHiddenGhastMigratesToHiddenGhastAndCargo(@TempDir Path directory)
+      throws IOException {
+    ClientSettingsFile loaded = load(directory, SCHEMA_9_HIDDEN_JSON);
+
+    assertEquals(HIDDEN_BOTH, loaded.toPreferences());
+    ClientSettingsFile migrated = ClientSettingsFile.from(loaded.toSettings(), HIDDEN_BOTH);
+    assertNull(migrated.hideGhastInFirstPerson());
+    assertSame(FirstPersonVisibility.HIDDEN, migrated.ghastFirstPerson());
+  }
+
+  @Test
+  void schemaNineShownGhastMigratesToNormal(@TempDir Path directory) throws IOException {
+    assertEquals(ClientPreferences.DEFAULTS, load(directory, SCHEMA_8_JSON).toPreferences());
+  }
+
+  @Test
+  void unknownOrMissingVisibilityLoadsNormal(@TempDir Path directory) throws IOException {
+    ClientPreferences preferences =
+        load(directory, SCHEMA_10_UNKNOWN_VISIBILITY_JSON).toPreferences();
+
+    assertEquals(
+        new ClientPreferences(FirstPersonVisibility.NORMAL, FirstPersonVisibility.SEMI_TRANSPARENT),
+        preferences);
   }
 }

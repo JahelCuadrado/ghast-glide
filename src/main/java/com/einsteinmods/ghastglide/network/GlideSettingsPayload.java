@@ -25,6 +25,8 @@ public record GlideSettingsPayload(GlideSettings settings) implements CustomPack
             buffer.writeByte(value.controlScheme().id());
             buffer.writeBoolean(value.hangBoatWithClick());
             buffer.writeBoolean(value.buildThroughGhast());
+            buffer.writeBoolean(value.mineAtNormalSpeed());
+            buffer.writeBoolean(value.passThroughEntities());
           },
           buffer ->
               new GlideSettingsPayload(
@@ -36,6 +38,8 @@ public record GlideSettingsPayload(GlideSettings settings) implements CustomPack
                           buffer.readBoolean(),
                           LeaveMode.fromId(buffer.readByte()),
                           ControlScheme.fromId(buffer.readByte()),
+                          buffer.readBoolean(),
+                          buffer.readBoolean(),
                           buffer.readBoolean(),
                           buffer.readBoolean())
                       .sanitized()));

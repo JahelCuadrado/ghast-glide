@@ -59,6 +59,7 @@ public final class GlideSettingsScreen extends Screen {
   private static final String PRESET_KEY_PREFIX = KEY_PREFIX + "preset.";
   private static final String LEAVE_MODE_KEY = KEY_PREFIX + "leave_mode";
   private static final String CONTROL_SCHEME_KEY = KEY_PREFIX + "controls";
+  private static final String VISIBILITY_KEY_PREFIX = KEY_PREFIX + "first_person_visibility.";
   private static final String MULTIPLIER_FORMAT = "x%.1f";
   private static final String SECONDS_FORMAT = "%.1f s";
 
@@ -108,7 +109,10 @@ public final class GlideSettingsScreen extends Screen {
   private final CyclingControl<LeaveMode> leaveMode;
   private final TickBoxControl hangBoat;
   private final TickBoxControl buildThroughGhast;
-  private final TickBoxControl hideGhastInFirstPerson;
+  private final TickBoxControl mineAtNormalSpeed;
+  private final TickBoxControl passThroughEntities;
+  private final CyclingControl<FirstPersonVisibility> ghastFirstPerson;
+  private final CyclingControl<FirstPersonVisibility> cargoFirstPerson;
 
   /** Key rows in display order, each with the mapping it edits. */
   private final Map<KeyMapping, KeyBindControl> keyControls = new LinkedHashMap<>();
@@ -216,11 +220,24 @@ public final class GlideSettingsScreen extends Screen {
     hangBoat = toggle("hang_boat", settings.hangBoatWithClick(), defaults.hangBoatWithClick());
     buildThroughGhast =
         toggle("build_through_ghast", settings.buildThroughGhast(), defaults.buildThroughGhast());
-    hideGhastInFirstPerson =
+    mineAtNormalSpeed =
+        toggle("mine_at_normal_speed", settings.mineAtNormalSpeed(), defaults.mineAtNormalSpeed());
+    passThroughEntities =
         toggle(
-            "hide_ghast_first_person",
-            state.preferences().hideGhastInFirstPerson(),
-            ClientPreferences.DEFAULTS.hideGhastInFirstPerson());
+            "pass_through_entities",
+            settings.passThroughEntities(),
+            defaults.passThroughEntities());
+    ClientPreferences preferences = state.preferences();
+    ghastFirstPerson =
+        visibility(
+            "ghast_first_person",
+            preferences.ghastFirstPerson(),
+            ClientPreferences.DEFAULTS.ghastFirstPerson());
+    cargoFirstPerson =
+        visibility(
+            "cargo_first_person",
+            preferences.cargoFirstPerson(),
+            ClientPreferences.DEFAULTS.cargoFirstPerson());
     Component keyDescription = Component.translatable(KEY_PREFIX + "key" + DESCRIPTION_SUFFIX);
     Component waiting = Component.translatable(KEY_PREFIX + "key.waiting");
     for (KeyMapping mapping : keyMappings.configurable()) {
@@ -252,7 +269,10 @@ public final class GlideSettingsScreen extends Screen {
             leaveMode,
             hangBoat,
             buildThroughGhast,
-            hideGhastInFirstPerson)) {
+            mineAtNormalSpeed,
+            passThroughEntities,
+            ghastFirstPerson,
+            cargoFirstPerson)) {
       list.addOption(option);
     }
     list.addGroup(
@@ -410,6 +430,22 @@ public final class GlideSettingsScreen extends Screen {
             value -> updateButtons()));
   }
 
+  /** A visibility row: the value names are shared, the description belongs to the row. */
+  private CyclingControl<FirstPersonVisibility> visibility(
+      String key, FirstPersonVisibility initial, FirstPersonVisibility defaultValue) {
+    Component description = Component.translatable(KEY_PREFIX + key + DESCRIPTION_SUFFIX);
+    return register(
+        new CyclingControl<>(
+            font,
+            Component.translatable(KEY_PREFIX + key),
+            Arrays.asList(FirstPersonVisibility.values()),
+            value -> Component.translatable(visibilityKey(value)),
+            value -> description,
+            initial,
+            defaultValue,
+            value -> updateButtons()));
+  }
+
   private static Tooltip tooltip(String button) {
     return Tooltip.create(Component.translatable(KEY_PREFIX + button + TOOLTIP_SUFFIX));
   }
@@ -456,7 +492,9 @@ public final class GlideSettingsScreen extends Screen {
         leaveMode.get(),
         controlScheme.get(),
         hangBoat.get(),
-        buildThroughGhast.get());
+        buildThroughGhast.get(),
+        mineAtNormalSpeed.get(),
+        passThroughEntities.get());
   }
 
   private boolean hasPendingChanges() {
@@ -486,7 +524,8 @@ public final class GlideSettingsScreen extends Screen {
       onClose();
       return;
     }
-    state.update(pendingSettings(), new ClientPreferences(hideGhastInFirstPerson.get()));
+    state.update(
+        pendingSettings(), new ClientPreferences(ghastFirstPerson.get(), cargoFirstPerson.get()));
     applyPendingKeys();
     controls.forEach(OptionControl::markSaved);
     updateButtons();
@@ -529,6 +568,10 @@ public final class GlideSettingsScreen extends Screen {
 
   private static String controlSchemeKey(ControlScheme value) {
     return CONTROL_SCHEME_KEY + "." + value.name().toLowerCase(Locale.ROOT);
+  }
+
+  private static String visibilityKey(FirstPersonVisibility value) {
+    return VISIBILITY_KEY_PREFIX + value.name().toLowerCase(Locale.ROOT);
   }
 
   private static String presetKey(FlightPreset value) {

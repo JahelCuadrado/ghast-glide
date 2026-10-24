@@ -70,6 +70,29 @@ public final class GlideRules {
         : null;
   }
 
+  /**
+   * True when {@code player} rides a Happy Ghast (as pilot or passenger) and asked to mine at
+   * normal speed. Both sides read the player's own effective settings: the server decides how long
+   * a block takes ({@code ServerPlayerGameMode}), the client only predicts the crack animation.
+   */
+  public static boolean minesAtGroundSpeed(Player player) {
+    if (!(player.getVehicle() instanceof HappyGhast)) {
+      return false;
+    }
+    GlideSettings settings = settingsFor(player);
+    return settings != null && settings.mineAtNormalSpeed();
+  }
+
+  /**
+   * True when a player flies {@code ghast} with "Pass through entities" on: it then neither
+   * collides with nor pushes other entities. Both sides must agree, as for noclip: the server
+   * replays every vehicle move ({@code ServerGamePacketListenerImpl#handleMoveVehicle}).
+   */
+  public static boolean passesThroughEntities(HappyGhast ghast) {
+    GlideSettings settings = activeSettings(ghast);
+    return settings != null && settings.passThroughEntities();
+  }
+
   public static FlightInput input(Player rider) {
     return clientBridge.input(rider);
   }

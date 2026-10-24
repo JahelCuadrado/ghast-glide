@@ -3,6 +3,7 @@ package com.einsteinmods.ghastglide.gametest;
 import com.einsteinmods.ghastglide.client.ClientGlideState;
 import com.einsteinmods.ghastglide.client.GhastGlideClient;
 import com.einsteinmods.ghastglide.client.config.ClientPreferences;
+import com.einsteinmods.ghastglide.client.config.FirstPersonVisibility;
 import com.einsteinmods.ghastglide.core.GlideSettings;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
@@ -68,7 +69,9 @@ public final class BuildThroughGhastClientGameTest implements FabricClientGameTe
       context.runOnClient(
           mc ->
               state.update(
-                  originalSettings.withBuildThroughGhast(true), new ClientPreferences(true)));
+                  originalSettings.withBuildThroughGhast(true),
+                  new ClientPreferences(
+                      FirstPersonVisibility.HIDDEN, FirstPersonVisibility.HIDDEN)));
       world.getServer().runOnServer(server -> mountGhastWithBlocks(connection));
       context.waitFor(BuildThroughGhastClientGameTest::ridesGhastWithBlocks);
       context.waitTicks(SETTLE_TICKS);

@@ -59,6 +59,18 @@ public final class GhastAnchors {
   }
 
   /**
+   * True while a player still rides {@code ghast} as its pilot (first passenger), so vanilla's
+   * still timeout must not start: {@code HappyGhast#removePassenger} sets it whenever any passenger
+   * leaves and {@code HappyGhast#tick} renews it while {@code scanPlayerAboveGhast} finds a player
+   * on its head (a dismounted passenger lands there). During that timeout {@code
+   * getControllingPassenger()} is null, so the pilot would lose steering and sneak would dismount
+   * it.
+   */
+  public static boolean keepsPilotControl(HappyGhast ghast) {
+    return ghast.getFirstPassenger() instanceof Player;
+  }
+
+  /**
    * Called instead of vanilla {@code HappyGhastLookControl#tick}, which snaps a still ghast's yaw
    * to the nearest cardinal direction every tick. Returns true when the ghast is anchored: its yaw
    * is then kept (head follows it), so a called ghast can turn and keep facing its caller.

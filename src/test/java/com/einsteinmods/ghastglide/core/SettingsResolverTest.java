@@ -13,7 +13,17 @@ class SettingsResolverTest {
   void unrestrictedPolicyKeepsSettings() {
     GlideSettings requested =
         new GlideSettings(
-            10.0, 10.0, 5.0, 3.0, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
+            10.0,
+            10.0,
+            5.0,
+            3.0,
+            true,
+            LeaveMode.NATURAL,
+            ControlScheme.MOD,
+            true,
+            false,
+            true,
+            true);
 
     GlideSettings effective = SettingsResolver.effective(requested, ServerPolicy.UNRESTRICTED);
 
@@ -24,7 +34,17 @@ class SettingsResolverTest {
   void policyCapsHorizontalSpeedIncludingSprint() {
     GlideSettings requested =
         new GlideSettings(
-            6.0, 2.0, 5.0, 4.0, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
+            6.0,
+            2.0,
+            5.0,
+            4.0,
+            true,
+            LeaveMode.NATURAL,
+            ControlScheme.MOD,
+            true,
+            false,
+            true,
+            true);
     ServerPolicy policy = new ServerPolicy(true, 12.0);
 
     GlideSettings effective = SettingsResolver.effective(requested, policy);
@@ -75,7 +95,17 @@ class SettingsResolverTest {
   void invalidValuesAreSanitized() {
     GlideSettings requested =
         new GlideSettings(
-            Double.NaN, -4.0, 99.0, 0.0, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
+            Double.NaN,
+            -4.0,
+            99.0,
+            0.0,
+            true,
+            LeaveMode.NATURAL,
+            ControlScheme.MOD,
+            true,
+            false,
+            true,
+            true);
 
     GlideSettings effective = SettingsResolver.effective(requested, ServerPolicy.UNRESTRICTED);
 
@@ -98,7 +128,9 @@ class SettingsResolverTest {
             LeaveMode.NATURAL,
             ControlScheme.MOD,
             true,
-            false);
+            false,
+            true,
+            true);
 
     GlideSettings effective =
         SettingsResolver.effective(requested, ServerPolicy.WITHOUT_SERVER_MOD);

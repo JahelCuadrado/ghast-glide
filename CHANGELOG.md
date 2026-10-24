@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.0 — 2026-10-24
+
+- **Mine at normal speed while riding** (new option, on by default): break blocks from your ghast
+  as fast as standing on the ground, instead of 5 times slower.
+- **Pass through entities** (new option, on by default): the ghast you fly glides through boats
+  and other ghasts and no longer pushes mobs away.
+- **First-person visibility:** choose how your ghast and its cargo (hanging boats, whoever sits in
+  them, mobs on its leads) look in first person: Normal, Hidden or Semi-transparent. Semi-transparent
+  fades the harness too. Replaces the old "Hide ghast in first person" option, keeping your choice.
+- **Riding with two:** the pilot keeps control when the other rider gets off or stands on top of
+  the ghast.
+
 ## 1.1.0 — 2026-10-16
 
 - **Hang a boat from your ghast:** while riding, right-click your ghast with a boat in hand and a

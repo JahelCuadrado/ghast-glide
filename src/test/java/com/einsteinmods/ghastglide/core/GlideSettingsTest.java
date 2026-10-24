@@ -21,7 +21,9 @@ class GlideSettingsTest {
                 LeaveMode.NATURAL,
                 ControlScheme.MOD,
                 true,
-                false)
+                false,
+                true,
+                true)
             .sanitized();
 
     assertEquals(GlideSettings.MAX_SPEED_MULTIPLIER, result.horizontalMultiplier());
@@ -35,7 +37,17 @@ class GlideSettingsTest {
     for (double invalid : new double[] {0.0, -1.0, Double.NaN}) {
       GlideSettings result =
           new GlideSettings(
-                  1.0, 1.0, 1.0, invalid, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false)
+                  1.0,
+                  1.0,
+                  1.0,
+                  invalid,
+                  true,
+                  LeaveMode.NATURAL,
+                  ControlScheme.MOD,
+                  true,
+                  false,
+                  true,
+                  true)
               .sanitized();
 
       assertEquals(GlideSettings.DEFAULT_ACCELERATION_SECONDS, result.accelerationSeconds());
@@ -43,12 +55,15 @@ class GlideSettingsTest {
   }
 
   @Test
-  void defaultsAreRecommendedWithPassThroughNaturalLeaveModeBoatHangingAndNoBuildThrough() {
+  void
+      defaultsAreRecommendedWithPassThroughNaturalLeaveModeBoatHangingNormalMiningAndEntityPassing() {
     assertSame(FlightPreset.RECOMMENDED, FlightPreset.matching(GlideSettings.DEFAULTS));
     assertTrue(GlideSettings.DEFAULTS.noclipEnabled());
     assertSame(LeaveMode.NATURAL, GlideSettings.DEFAULTS.leaveMode());
     assertTrue(GlideSettings.DEFAULTS.hangBoatWithClick());
     assertFalse(GlideSettings.DEFAULTS.buildThroughGhast());
+    assertTrue(GlideSettings.DEFAULTS.mineAtNormalSpeed());
+    assertTrue(GlideSettings.DEFAULTS.passThroughEntities());
   }
 
   @Test
@@ -76,7 +91,17 @@ class GlideSettingsTest {
   void tooShortAccelerationIsClampedToMinimum() {
     GlideSettings result =
         new GlideSettings(
-                1.0, 1.0, 1.0, 0.01, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false)
+                1.0,
+                1.0,
+                1.0,
+                0.01,
+                true,
+                LeaveMode.NATURAL,
+                ControlScheme.MOD,
+                true,
+                false,
+                true,
+                true)
             .sanitized();
 
     assertEquals(GlideSettings.MIN_ACCELERATION_SECONDS, result.accelerationSeconds());

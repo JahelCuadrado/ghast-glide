@@ -24,6 +24,8 @@ public final class SettingsResolver {
         settings.leaveMode(),
         settings.controlScheme(),
         settings.hangBoatWithClick(),
-        settings.buildThroughGhast());
+        settings.buildThroughGhast(),
+        settings.mineAtNormalSpeed(),
+        settings.passThroughEntities());
   }
 }

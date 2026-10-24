@@ -1,6 +1,9 @@
 # Ghast Glide
 
-The Happy Ghast as it always should have been: a little bit of creative inside survival, to build comfortably anywhere.
+This mod is designed to make the Happy Ghast the tool it always should have been: it goes from
+barely useful to an essential building tool.
+
+A little bit of creative inside survival, to build comfortably anywhere.
 
 Fabric mod for Minecraft 26.3.
 
@@ -9,6 +12,10 @@ Fabric mod for Minecraft 26.3.
   extra speed. Smooth, natural acceleration.
 - **Pass through blocks:** your ghast glides through terrain, so you can stay with it comfortably
   while building in the air, inside mountains or in tight spaces. Turn it off whenever you want.
+- **Glide through mobs and boats:** your ghast passes through boats, mobs and other ghasts
+  without bumping into them or pushing them away (can be turned off).
+- **Mine at normal speed:** break blocks while riding as fast as standing on the ground, instead
+  of 5 times slower (can be turned off).
 - **Balanced speed:** faster than a vanilla Happy Ghast, but much slower than elytra, so it is a
   building tool, not a replacement. Pick a preset (Vanilla, Calm, Recommended, Fast, Creative) or
   tune your own.
@@ -21,8 +28,9 @@ Fabric mod for Minecraft 26.3.
   or wanders like vanilla. Your choice.
 - **Easy dismount:** `Left Alt` gets you off, since Sneak is used to descend. Every key can be
   changed.
-- **Simple settings screen** with no extra libraries (Mod Menu supported), including an option to
-  hide the ghast (and the boats hanging from it) in first person for a clear view while you build.
+- **Clear view while you build:** choose how your ghast and its cargo (hanging boats, whoever sits
+  in them, mobs on its leads) look in first person: Normal, Hidden or Semi-transparent.
+- **Simple settings screen** with no extra libraries (Mod Menu supported).
 - **Lightweight:** no noticeable impact on performance.
 - **Languages:** English, Español (España), Español (México), Português (Brasil), Português (Portugal),
   Français, Deutsch, Italiano, Nederlands, Polski, Türkçe, Русский, Українська, 简体中文, 繁體中文,

@@ -13,6 +13,10 @@ package com.einsteinmods.ghastglide.core;
  * @param hangBoatWithClick whether using a boat on the ridden ghast hangs it below with a lead
  * @param buildThroughGhast whether the ridden ghast (and its other passengers) never obstruct the
  *     blocks this player places while riding it
+ * @param mineAtNormalSpeed whether this player mines at ground speed while riding a ghast (vanilla
+ *     divides mining speed by 5 off the ground, and passengers are never on the ground)
+ * @param passThroughEntities whether the ghast this player flies neither collides with nor pushes
+ *     other entities (boats, mobs, other ghasts)
  */
 public record GlideSettings(
     double horizontalMultiplier,
@@ -23,7 +27,9 @@ public record GlideSettings(
     LeaveMode leaveMode,
     ControlScheme controlScheme,
     boolean hangBoatWithClick,
-    boolean buildThroughGhast) {
+    boolean buildThroughGhast,
+    boolean mineAtNormalSpeed,
+    boolean passThroughEntities) {
 
   public static final double MIN_SPEED_MULTIPLIER = 0.1;
   public static final double MAX_SPEED_MULTIPLIER = 10.0;
@@ -55,7 +61,9 @@ public record GlideSettings(
           LeaveMode.DEFAULT,
           ControlScheme.DEFAULT,
           true,
-          false);
+          false,
+          true,
+          true);
 
   /**
    * Returns a copy with every value forced into its allowed range (NaN falls back to default). A
@@ -90,7 +98,9 @@ public record GlideSettings(
         leaveMode == null ? LeaveMode.DEFAULT : leaveMode,
         controlScheme == null ? ControlScheme.DEFAULT : controlScheme,
         hangBoatWithClick,
-        buildThroughGhast);
+        buildThroughGhast,
+        mineAtNormalSpeed,
+        passThroughEntities);
   }
 
   public GlideSettings withNoclipEnabled(boolean enabled) {
@@ -103,7 +113,9 @@ public record GlideSettings(
         leaveMode,
         controlScheme,
         hangBoatWithClick,
-        buildThroughGhast);
+        buildThroughGhast,
+        mineAtNormalSpeed,
+        passThroughEntities);
   }
 
   public GlideSettings withLeaveMode(LeaveMode mode) {
@@ -116,7 +128,9 @@ public record GlideSettings(
         mode,
         controlScheme,
         hangBoatWithClick,
-        buildThroughGhast);
+        buildThroughGhast,
+        mineAtNormalSpeed,
+        passThroughEntities);
   }
 
   public GlideSettings withControlScheme(ControlScheme scheme) {
@@ -129,7 +143,9 @@ public record GlideSettings(
         leaveMode,
         scheme,
         hangBoatWithClick,
-        buildThroughGhast);
+        buildThroughGhast,
+        mineAtNormalSpeed,
+        passThroughEntities);
   }
 
   public GlideSettings withHangBoatWithClick(boolean enabled) {
@@ -142,7 +158,9 @@ public record GlideSettings(
         leaveMode,
         controlScheme,
         enabled,
-        buildThroughGhast);
+        buildThroughGhast,
+        mineAtNormalSpeed,
+        passThroughEntities);
   }
 
   public GlideSettings withBuildThroughGhast(boolean enabled) {
@@ -155,6 +173,38 @@ public record GlideSettings(
         leaveMode,
         controlScheme,
         hangBoatWithClick,
+        enabled,
+        mineAtNormalSpeed,
+        passThroughEntities);
+  }
+
+  public GlideSettings withMineAtNormalSpeed(boolean enabled) {
+    return new GlideSettings(
+        horizontalMultiplier,
+        verticalMultiplier,
+        sprintMultiplier,
+        accelerationSeconds,
+        noclipEnabled,
+        leaveMode,
+        controlScheme,
+        hangBoatWithClick,
+        buildThroughGhast,
+        enabled,
+        passThroughEntities);
+  }
+
+  public GlideSettings withPassThroughEntities(boolean enabled) {
+    return new GlideSettings(
+        horizontalMultiplier,
+        verticalMultiplier,
+        sprintMultiplier,
+        accelerationSeconds,
+        noclipEnabled,
+        leaveMode,
+        controlScheme,
+        hangBoatWithClick,
+        buildThroughGhast,
+        mineAtNormalSpeed,
         enabled);
   }
 

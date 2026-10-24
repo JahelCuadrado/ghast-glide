@@ -182,7 +182,9 @@ class FlightPresetTest {
             LeaveMode.NATURAL,
             ControlScheme.MOD,
             true,
-            false);
+            false,
+            true,
+            true);
 
     assertSame(FlightPreset.CUSTOM, FlightPreset.matching(tweaked));
   }
@@ -191,7 +193,17 @@ class FlightPresetTest {
   void customKeepsTheCurrentValues() {
     GlideSettings current =
         new GlideSettings(
-            2.0, 3.0, 1.2, 0.5, false, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
+            2.0,
+            3.0,
+            1.2,
+            0.5,
+            false,
+            LeaveMode.NATURAL,
+            ControlScheme.MOD,
+            true,
+            false,
+            true,
+            true);
 
     assertEquals(current, FlightPreset.CUSTOM.applyTo(current));
   }
@@ -215,6 +227,20 @@ class FlightPresetTest {
     GlideSettings building = GlideSettings.DEFAULTS.withBuildThroughGhast(true);
 
     assertTrue(FlightPreset.FAST.applyTo(building).buildThroughGhast());
+  }
+
+  @Test
+  void applyingAPresetKeepsMiningAtNormalSpeedDisabled() {
+    GlideSettings slowMining = GlideSettings.DEFAULTS.withMineAtNormalSpeed(false);
+
+    assertFalse(FlightPreset.FAST.applyTo(slowMining).mineAtNormalSpeed());
+  }
+
+  @Test
+  void applyingAPresetKeepsPassThroughEntitiesDisabled() {
+    GlideSettings colliding = GlideSettings.DEFAULTS.withPassThroughEntities(false);
+
+    assertFalse(FlightPreset.FAST.applyTo(colliding).passThroughEntities());
   }
 
   @Test

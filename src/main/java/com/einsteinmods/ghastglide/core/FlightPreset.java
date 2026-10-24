@@ -94,7 +94,9 @@ public enum FlightPreset {
         current.leaveMode(),
         current.controlScheme(),
         current.hangBoatWithClick(),
-        current.buildThroughGhast());
+        current.buildThroughGhast(),
+        current.mineAtNormalSpeed(),
+        current.passThroughEntities());
   }
 
   /**

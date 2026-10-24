@@ -59,6 +59,20 @@ class GlideSettingsPayloadTest {
   }
 
   @Test
+  void roundTripKeepsMiningAtNormalSpeedDisabled() {
+    GlideSettings settings = GlideSettings.DEFAULTS.withMineAtNormalSpeed(false);
+
+    assertEquals(settings, roundTrip(settings));
+  }
+
+  @Test
+  void roundTripKeepsPassThroughEntitiesDisabled() {
+    GlideSettings settings = GlideSettings.DEFAULTS.withPassThroughEntities(false);
+
+    assertEquals(settings, roundTrip(settings));
+  }
+
+  @Test
   void unknownLeaveModeAndControlSchemeIdsDecodeAsDefault() {
     RegistryFriendlyByteBuf buffer =
         new RegistryFriendlyByteBuf(Unpooled.buffer(), RegistryAccess.EMPTY);
@@ -72,6 +86,8 @@ class GlideSettingsPayloadTest {
     buffer.writeByte(UNKNOWN_CONTROL_SCHEME_ID);
     buffer.writeBoolean(defaults.hangBoatWithClick());
     buffer.writeBoolean(defaults.buildThroughGhast());
+    buffer.writeBoolean(defaults.mineAtNormalSpeed());
+    buffer.writeBoolean(defaults.passThroughEntities());
 
     GlideSettings decoded = GlideSettingsPayload.CODEC.decode(buffer).settings();
     assertEquals(LeaveMode.DEFAULT, decoded.leaveMode());

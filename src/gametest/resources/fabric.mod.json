@@ -11,13 +11,16 @@
       "com.einsteinmods.ghastglide.gametest.BuildThroughGhastGameTest",
       "com.einsteinmods.ghastglide.gametest.ControlSchemeGameTest",
       "com.einsteinmods.ghastglide.gametest.GhastLightGameTest",
+      "com.einsteinmods.ghastglide.gametest.MiningWhileRidingGameTest",
       "com.einsteinmods.ghastglide.gametest.NoclipGameTest",
-      "com.einsteinmods.ghastglide.gametest.RiderClearanceGameTest"
+      "com.einsteinmods.ghastglide.gametest.PassThroughEntitiesGameTest",
+      "com.einsteinmods.ghastglide.gametest.RiderClearanceGameTest",
+      "com.einsteinmods.ghastglide.gametest.SharedRideGameTest"
     ],
     "fabric-client-gametest": [
       "com.einsteinmods.ghastglide.gametest.BoatHangingClientGameTest",
       "com.einsteinmods.ghastglide.gametest.BuildThroughGhastClientGameTest",
-      "com.einsteinmods.ghastglide.gametest.HideHungBoatsClientGameTest",
+      "com.einsteinmods.ghastglide.gametest.FirstPersonVisibilityClientGameTest",
       "com.einsteinmods.ghastglide.gametest.SneakDescendClientGameTest"
     ]
   },

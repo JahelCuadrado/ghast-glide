@@ -27,7 +27,9 @@ class CreativeFlightModelTest {
         defaults.leaveMode(),
         ControlScheme.MOD,
         true,
-        false);
+        false,
+        true,
+        true);
   }
 
   private static Motion tick(Motion velocity, FlightInput input, GlideSettings settings) {
@@ -129,7 +131,17 @@ class CreativeFlightModelTest {
   void sprintAndHorizontalMultiplierScaleHorizontalSpeed() {
     GlideSettings settings =
         new GlideSettings(
-            3.0, 1.0, 2.0, 2.0, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
+            3.0,
+            1.0,
+            2.0,
+            2.0,
+            true,
+            LeaveMode.NATURAL,
+            ControlScheme.MOD,
+            true,
+            false,
+            true,
+            true);
 
     Motion result = CreativeFlightModel.accelerate(Motion.ZERO, forward(true), settings);
 
@@ -153,7 +165,17 @@ class CreativeFlightModelTest {
   void ascendAndDescendUseVerticalMultiplierAndCancelOut() {
     GlideSettings settings =
         new GlideSettings(
-            1.0, 2.0, 2.0, 2.0, true, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
+            1.0,
+            2.0,
+            2.0,
+            2.0,
+            true,
+            LeaveMode.NATURAL,
+            ControlScheme.MOD,
+            true,
+            false,
+            true,
+            true);
     FlightInput up = new FlightInput(0.0F, 0.0F, true, false, false, NO_YAW);
     FlightInput both = new FlightInput(0.0F, 0.0F, true, true, false, NO_YAW);
 
@@ -257,7 +279,17 @@ class CreativeFlightModelTest {
   void pitchSteeredWithLevelLookEqualsCreativeVariant() {
     GlideSettings settings =
         new GlideSettings(
-            2.5, 1.5, 3.0, 2.0, false, LeaveMode.NATURAL, ControlScheme.MOD, true, false);
+            2.5,
+            1.5,
+            3.0,
+            2.0,
+            false,
+            LeaveMode.NATURAL,
+            ControlScheme.MOD,
+            true,
+            false,
+            true,
+            true);
     Motion current = new Motion(0.1, -0.2, 0.3);
     FlightInput[] inputs = {
       new FlightInput(0.0F, 1.0F, false, false, false, 37.0F),
@@ -298,7 +330,9 @@ class CreativeFlightModelTest {
                 LeaveMode.NATURAL,
                 ControlScheme.MOD,
                 true,
-                false),
+                false,
+                true,
+                true),
             ServerPolicy.WITHOUT_SERVER_MOD);
     FlightInput climb = new FlightInput(0.0F, 1.0F, true, false, true, NO_YAW, -90.0F);
 

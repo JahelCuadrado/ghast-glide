@@ -9,6 +9,7 @@
     "EntityMixin",
     "HappyGhastAnchorMixin",
     "HappyGhastBoatMixin",
+    "HappyGhastEntityPassMixin",
     "HappyGhastLightMixin",
     "HappyGhastLookControlMixin",
     "HappyGhastMixin",

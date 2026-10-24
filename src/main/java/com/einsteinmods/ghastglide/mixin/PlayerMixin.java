@@ -1,6 +1,7 @@
 package com.einsteinmods.ghastglide.mixin;
 
 import com.einsteinmods.ghastglide.glide.GlideRules;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
@@ -35,5 +36,18 @@ abstract class PlayerMixin {
     return desired == Pose.CROUCHING && GlideRules.isGliding((Player) (Object) this)
         ? Pose.STANDING
         : desired;
+  }
+
+  /**
+   * Vanilla {@code Player#getDestroySpeed} divides mining speed by 5 when {@code !onGround()}, and
+   * {@code Player#tick} keeps every passenger off the ground, so a ghast rider would always mine 5
+   * times slower. With "Mine at normal speed" the rider counts as grounded for that check only.
+   * Runs only while a block is being mined; a grounded player returns at the first check.
+   */
+  @ModifyExpressionValue(
+      method = "getDestroySpeed",
+      at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;onGround()Z"))
+  private boolean ghastglide$mineAtGroundSpeedWhileRiding(boolean onGround) {
+    return onGround || GlideRules.minesAtGroundSpeed((Player) (Object) this);
   }
 }
